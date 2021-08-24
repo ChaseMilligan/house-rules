@@ -8,7 +8,7 @@
   },
   "hosting": {
     "site": "house-rules-4ffbc",
-    "public": "public",
+    "public": "build",
     "headers": [
       {
         "source": "/service-worker.js",
