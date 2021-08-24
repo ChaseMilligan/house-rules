@@ -1,25 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import { Box } from "grommet";
+
+const AppBar = (props) => (
+  <Box
+    tag="header"
+    direction="row"
+    align="center"
+    justify="between"
+    background="brand"
+    pad={{ left: "medium", right: "small", vertical: "small" }}
+    elevation="medium"
+    style={{ zIndex: "1" }}
+    {...props}
+  />
+);
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  return <AppBar>Hello Grommet!</AppBar>;
 }
 
 export default App;
