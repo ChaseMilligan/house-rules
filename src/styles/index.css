@@ -1,0 +1,21 @@
+@font-face {
+  font-family: "sf_distant_galaxyregular";
+  src: url("sfdistantgalaxy-0l3d-webfont.woff2") format("woff2"),
+    url("sfdistantgalaxy-0l3d-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+h1 {
+  font-family: "sf_distant_galaxyregular";
+  src: url("sfdistantgalaxy-0l3d-webfont.woff2") format("woff2"),
+    url("sfdistantgalaxy-0l3d-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  color: #423fc2;
+}
+
+form {
+  max-width: 400px;
+  width: 80vw;
+}

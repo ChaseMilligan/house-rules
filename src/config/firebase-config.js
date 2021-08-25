@@ -1,9 +1,5 @@
 import firebase from "firebase";
-import "firebase/firestore";
-import "firebase/auth";
-import "firebase/storage";
 
-// Your web app's Firebase configuration
 var firebaseConfig = {
   apiKey: "AIzaSyDJyY9NZcwL7f6zxWHUhS9K4ZLhSNWpZec",
   authDomain: "house-rules-4ffbc.firebaseapp.com",
@@ -16,5 +12,10 @@ var firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+firebase.analytics();
+
+export const db = firebase.firestore();
+export const auth = firebase.auth();
+export const storage = firebase.storage().ref();
 
 export default firebase;
