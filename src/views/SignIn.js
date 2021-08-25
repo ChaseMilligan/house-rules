@@ -68,7 +68,7 @@ export default function SignIn() {
               secondary
               label="Create Account"
               icon={<UserNew />}
-              onClick={() => console.log("create user")}
+              onClick={() => console.log("")}
               margin=".5em 0px"
             />
           </Box>
