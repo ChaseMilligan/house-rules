@@ -123,7 +123,7 @@ function App() {
                       <p>You are not Logged in.</p>
                     )}
                   </Box>
-                  {!showSidebar ? (
+                  {!showSidebar && size !== "small" ? (
                     <Collapsible direction="horizontal" open={showSidebar}>
                       <Box
                         flex
