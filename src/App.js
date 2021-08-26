@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "./styles/index.css";
-import { Box, Grommet, Spinner, ResponsiveContext, Paragraph } from "grommet";
+import { Box, Grommet, ResponsiveContext } from "grommet";
 import { auth } from "./config/firebase-config";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import CreateUser from "./views/CreateUser";
 import SignIn from "./views/SignIn";
-
 import MainView from "./views/MainView";
-import Profile from "./views/pages/Profile";
 import Loading from "./components/Loading";
 
 const theme = {
@@ -40,8 +38,6 @@ function App() {
       }
     });
   }, []);
-
-  console.log(loading);
 
   return (
     <Router>

@@ -1,6 +1,13 @@
 import React, { useState } from "react";
-import { Box, Button, Collapsible, Layer, Heading } from "grommet";
-import { FormClose, Logout, Menu } from "grommet-icons";
+import { Box, Button, Collapsible, Layer, Heading, Nav, Anchor } from "grommet";
+import {
+  FormClose,
+  Logout,
+  Menu,
+  Notification,
+  ChatOption,
+  Home as House,
+} from "grommet-icons";
 import AppBar from "../components/AppBar";
 import { auth } from "../config/firebase-config";
 import { Switch, Route, Link } from "react-router-dom";
@@ -16,13 +23,15 @@ export default function MainView() {
     const signOut = auth
       .signOut()
       .then((res) => {
+        setLoading(false);
         return res;
       })
       .catch((err) => {
+        setLoading(false);
         return err;
       });
-    setLoading(false);
   }
+
   return (
     <>
       <AppBar>
@@ -69,10 +78,10 @@ export default function MainView() {
             </Box>
             <Box fill background="light-2" align="center" justify="center">
               <Link to="/" onClick={() => setShowSidebar(false)}>
-                Home
+                <h1>Home</h1>
               </Link>
               <Link to="/profile" onClick={() => setShowSidebar(false)}>
-                Profile
+                <h1>Profile</h1>
               </Link>
               <Button
                 primary
@@ -84,6 +93,11 @@ export default function MainView() {
           </Layer>
         )}
       </Box>
+      <Nav direction="row" background="brand" pad="medium" justify="around">
+        <Anchor icon={<Notification />} hoverIndicator />
+        <Anchor icon={<House />} hoverIndicator />
+        <Anchor icon={<ChatOption />} hoverIndicator />
+      </Nav>
     </>
   );
 }

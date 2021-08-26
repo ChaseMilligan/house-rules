@@ -15,6 +15,12 @@ h1 {
   color: #423fc2;
 }
 
+h2 {
+  color: #f0b347;
+  font-weight: 900;
+  font-size: 4em;
+}
+
 form {
   max-width: 400px;
   width: 80vw;

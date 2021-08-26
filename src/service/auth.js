@@ -17,7 +17,6 @@ export const emailPassAuth = (email, password) => {
     .signInWithEmailAndPassword(email, password)
     .then((userCredential) => {
       //Signed In
-      console.log("logged in");
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -43,8 +42,6 @@ export const createEmailPassAuth = (email, name, password) => {
 };
 
 function updateFirestore(email, name, uid) {
-  console.log("updated store");
-
   let data = {};
 
   data["email"] = email;
@@ -59,7 +56,6 @@ function updateFirestore(email, name, uid) {
     .catch((e) => {
       console.log(e);
     });
-  console.log("updated");
 }
 
 export default socialMediaAuth;

@@ -12,6 +12,5 @@ export async function getUserByUid(uid) {
     .catch((err) => {
       res = err;
     });
-  console.log(res);
   return res;
 }

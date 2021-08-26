@@ -1,4 +1,4 @@
-import { Box, Spinner } from "grommet";
+import { Box } from "grommet";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import { auth } from "../../config/firebase-config";
@@ -16,22 +16,20 @@ export default function Profile() {
     });
   }, []);
 
+  if (loading) {
+    <Loading />;
+  }
+
   return (
     <Box flex align="center" justify="center">
       <h1>Profile</h1>
-      {!user && loading ? (
-        <Loading />
-      ) : (
+      {user ? (
         <>
-          {user ? (
-            <>
-              <p>Name: {user.name}</p>
-              <p>Email: {user.email}</p>
-            </>
-          ) : (
-            <p>no user found</p>
-          )}
+          <p>Name: {user.name}</p>
+          <p>Email: {user.email}</p>
         </>
+      ) : (
+        <p>no user found</p>
       )}
     </Box>
   );
