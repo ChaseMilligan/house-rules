@@ -1,10 +1,18 @@
 import { auth, db } from "../config/firebase-config";
+import { getUserByUid } from "./Users";
 
 const socialMediaAuth = (provider) => {
   auth
     .signInWithPopup(provider)
-    .then((res) => {
-      updateFirestore(res.user.email, res.user.displayName, res.user.uid);
+    .then(async (res) => {
+      getUserByUid(res.user.uid).then((result) => {
+        console.log("then", result);
+        if (!result.activeRoomUid) {
+          console.log("NOOOOOOO");
+          updateFirestore(res.user.email, res.user.displayName, res.user.uid);
+        }
+      });
+
       return res.user;
     })
     .catch((err) => {

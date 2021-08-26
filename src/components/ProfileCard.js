@@ -6,10 +6,10 @@ export default function ProfileCard(props) {
   const [meterColor, setMeterColor] = useState("#FFAA15");
 
   useEffect(() => {
-    if (props.winLoss > 51.5) {
+    if (props.winLoss > 52) {
       setMeterColor("#00C781");
     }
-    if (props.winLoss < 49.5) {
+    if (props.winLoss < 48) {
       setMeterColor("#FF4040");
     }
   }, [props.winLoss]);
