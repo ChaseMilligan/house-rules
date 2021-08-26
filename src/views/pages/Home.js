@@ -1,4 +1,4 @@
-import { Box, TextInput, Button, Heading } from "grommet";
+import { Box, TextInput, Button, Heading, Form } from "grommet";
 import { Bar, Aggregate, Run } from "grommet-icons";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
@@ -31,6 +31,7 @@ export default function Home() {
     await joinRoom(auth.currentUser.uid, codeValue);
     getUserActiveRoom(auth.currentUser.uid).then((room) => {
       setRoom(room);
+      setCodeValue(null);
       setLoading(false);
     });
     setLoading(false);
@@ -89,19 +90,23 @@ export default function Home() {
   return (
     <Box margin="4em 0px" flex align="center" justify="around">
       <Box flex="shrink" align="center" justify="center">
-        <TextInput
-          placeholder="Enter House Code here..."
-          value={codeValue}
-          onChange={(event) => setCodeValue(event.target.value)}
-        />
-        <Button
-          margin=".5em 0px"
-          primary
-          size="large"
-          label="Join a Party"
-          icon={<Aggregate />}
-          onClick={handleJoinRoom}
-        />
+        <Form onSubmit={handleJoinRoom}>
+          <Box flex="shrink" align="center" justify="center">
+            <TextInput
+              placeholder="Enter House Code here..."
+              value={codeValue}
+              onChange={(event) => setCodeValue(event.target.value)}
+            />
+            <Button
+              margin=".5em 0px"
+              primary
+              type="submit"
+              size="large"
+              label="Join a Party"
+              icon={<Aggregate />}
+            />
+          </Box>
+        </Form>
       </Box>
       <Heading>Or</Heading>
       <Button
