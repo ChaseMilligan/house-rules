@@ -24,19 +24,17 @@ export async function joinRoom(userUid, houseCode) {
   const user = await getUserByUid(userUid);
   await db
     .collection("rooms")
-    .where("code", "==", houseCode)
+    .doc(houseCode)
     .get()
-    .then((snap) => {
-      snap.forEach((room) => {
-        console.log(room.data(), room.id);
-        db.collection("rooms")
-          .doc(room.id)
-          .update({
-            members: [...room.data().members, { ...user, uid: userUid }],
-          });
-        db.collection("users").doc(userUid).update({
-          activeRoomUid: room.id,
+    .then((room) => {
+      console.log(room.data(), room.id);
+      db.collection("rooms")
+        .doc(room.id)
+        .update({
+          members: [...room.data().members, { ...user, uid: userUid }],
         });
+      db.collection("users").doc(userUid).update({
+        activeRoomUid: room.id,
       });
     })
     .catch((err) => {
@@ -57,7 +55,10 @@ export async function getUserActiveRoom(userUid) {
         .doc(user.data().activeRoomUid)
         .get()
         .then((room) => {
-          res = { ...room.data(), uid: room.id };
+          if (room.exists) {
+            console.log("here");
+            res = { ...room.data(), uid: room.id };
+          }
         })
         .catch((err) => {
           res = null;
