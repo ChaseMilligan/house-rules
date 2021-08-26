@@ -1,8 +1,25 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+    match /{allPaths=**} {
+      allow read, write, create: if request.auth != null;
+    }
+    match /vendors/{vendorId} {
+      allow update, delete: if request.auth != null && request.auth.uid == vendorId;
+      allow create: if request.auth != null;
+    	match /menu-items/{allPaths=**} {
+      	allow create, update, delete: if request.auth != null && request.auth.uid == vendorId;
+    	}
+      match /deals/{allPaths=**} {
+        allow create, update, delete: if request.auth != null && request.auth.uid == vendorId;
+      }
+      match /reviews/{allPaths=**} {
+        allow write: if request.auth != null;
+      }
+    }
+    match /customers/{customerId} {
+      allow update, delete: if request.auth != null && request.auth.uid == customerId;
+      allow create: if request.auth != null;
     }
   }
 }
