@@ -42,6 +42,30 @@ export async function joinRoom(userUid, houseCode) {
     });
 }
 
+export async function leaveRoom(userUid) {
+  const user = await getUserByUid(userUid);
+  await db
+    .collection("rooms")
+    .doc(user.activeRoomUid)
+    .get()
+    .then((room) => {
+      console.log("here");
+      const filteredMembers = room.data().members.filter((member) => {
+        console.log("hehe", member);
+        return member.uid !== userUid;
+      });
+      console.log(filteredMembers);
+      db.collection("rooms").doc(room.id).update({ members: filteredMembers });
+      db.collection("users").doc(userUid).update({
+        activeRoomUid: "",
+      });
+    })
+    .catch((err) => {
+      console.log("fail");
+      return err;
+    });
+}
+
 export async function getUserActiveRoom(userUid) {
   let res = null;
   await db
@@ -49,14 +73,12 @@ export async function getUserActiveRoom(userUid) {
     .doc(userUid)
     .get()
     .then(async (user) => {
-      console.log(user.data());
       await db
         .collection("rooms")
         .doc(user.data().activeRoomUid)
         .get()
         .then((room) => {
           if (room.exists) {
-            console.log("here");
             res = { ...room.data(), uid: room.id };
           }
         })

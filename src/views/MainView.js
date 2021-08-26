@@ -14,6 +14,7 @@ import { auth } from "../config/firebase-config";
 import { Switch, Route, Link } from "react-router-dom";
 import Profile from "./pages/Profile";
 import Home from "./pages/Home";
+import Rules from "./pages/Rules";
 
 export default function MainView() {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -49,6 +50,9 @@ export default function MainView() {
         <Switch>
           <Route exact path="/profile">
             <Profile />
+          </Route>
+          <Route exact path="/rules">
+            <Rules />
           </Route>
           <Route path="/">
             <Home />

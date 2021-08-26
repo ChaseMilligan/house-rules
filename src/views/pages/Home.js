@@ -1,11 +1,16 @@
 import { Box, TextInput, Button, Heading } from "grommet";
-import { Bar, Aggregate } from "grommet-icons";
+import { Bar, Aggregate, Run } from "grommet-icons";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import ProfileCard from "../../components/ProfileCard";
 import { auth } from "../../config/firebase-config";
 import { getRndInteger } from "../../scripts/helpers";
-import { createRoom, getUserActiveRoom, joinRoom } from "../../service/Rooms";
+import {
+  createRoom,
+  getUserActiveRoom,
+  joinRoom,
+  leaveRoom,
+} from "../../service/Rooms";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -16,7 +21,6 @@ export default function Home() {
     setLoading(true);
     await createRoom(auth.currentUser.uid);
     getUserActiveRoom(auth.currentUser.uid).then((room) => {
-      console.log(room);
       setRoom(room);
       setLoading(false);
     });
@@ -25,6 +29,16 @@ export default function Home() {
   async function handleJoinRoom() {
     setLoading(true);
     await joinRoom(auth.currentUser.uid, codeValue);
+    getUserActiveRoom(auth.currentUser.uid).then((room) => {
+      setRoom(room);
+      setLoading(false);
+    });
+    setLoading(false);
+  }
+
+  async function handleLeaveRoom() {
+    setLoading(true);
+    await leaveRoom(auth.currentUser.uid);
     getUserActiveRoom(auth.currentUser.uid).then((room) => {
       console.log(room);
       setRoom(room);
@@ -37,7 +51,6 @@ export default function Home() {
     setLoading(true);
     getUserActiveRoom(auth.currentUser.uid).then((room) => {
       if (room) {
-        console.log(room);
         setRoom(room);
       }
       setLoading(false);
@@ -50,10 +63,16 @@ export default function Home() {
     return <Loading />;
   }
 
-  if (room) {
+  if (room !== null) {
     return (
       <Box fill flex align="center" justify="start">
         <h2>{room.uid}</h2>
+        <Button
+          size="small"
+          label="Leave Party"
+          icon={<Run />}
+          onClick={handleLeaveRoom}
+        />
         <div className="container-fluid">
           {room.members.map((member) => (
             <ProfileCard
