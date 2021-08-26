@@ -4,16 +4,16 @@ import { getUserByUid } from "./Users";
 
 export async function createRoom(userUid) {
   const user = await getUserByUid(userUid);
+  const roomCode = getRoomCode();
   await db
     .collection("rooms")
-    .doc(userUid)
+    .doc(roomCode)
     .set({
-      code: getRoomCode(),
       members: [{ ...user, uid: userUid }],
       games: [],
     })
     .then(() => {
-      db.collection("users").doc(userUid).update({ activeRoomUid: userUid });
+      db.collection("users").doc(roomCode).update({ activeRoomUid: roomCode });
     })
     .catch((err) => {
       return err;
@@ -51,19 +51,23 @@ export async function getUserActiveRoom(userUid) {
     .doc(userUid)
     .get()
     .then(async (user) => {
+      console.log(user.data());
       await db
         .collection("rooms")
         .doc(user.data().activeRoomUid)
         .get()
-        .then((room) => {
-          res = { ...room.data(), uid: room.id };
+        .then((snap) => {
+          snap.forEach((room) => {
+            console.log(room.data(), room.id);
+            res = { ...room.data(), uid: room.id };
+          });
         })
         .catch((err) => {
-          res = err;
+          res = null;
         });
     })
     .catch((err) => {
-      res = err;
+      res = null;
     });
   return res;
 }
