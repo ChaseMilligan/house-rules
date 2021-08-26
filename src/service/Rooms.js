@@ -13,7 +13,7 @@ export async function createRoom(userUid) {
       games: [],
     })
     .then(() => {
-      db.collection("users").doc(roomCode).update({ activeRoomUid: roomCode });
+      db.collection("users").doc(userUid).update({ activeRoomUid: roomCode });
     })
     .catch((err) => {
       return err;
@@ -56,11 +56,8 @@ export async function getUserActiveRoom(userUid) {
         .collection("rooms")
         .doc(user.data().activeRoomUid)
         .get()
-        .then((snap) => {
-          snap.forEach((room) => {
-            console.log(room.data(), room.id);
-            res = { ...room.data(), uid: room.id };
-          });
+        .then((room) => {
+          res = { ...room.data(), uid: room.id };
         })
         .catch((err) => {
           res = null;

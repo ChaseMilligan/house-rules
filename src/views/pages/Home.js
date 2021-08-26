@@ -53,7 +53,7 @@ export default function Home() {
   if (room) {
     return (
       <Box fill flex align="center" justify="start">
-        <h2>{room.code}</h2>
+        <h2>{room.uid}</h2>
         <div className="container-fluid">
           {room.members.map((member) => (
             <ProfileCard
