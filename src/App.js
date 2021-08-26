@@ -8,11 +8,16 @@ import SignIn from "./views/SignIn";
 import MainView from "./views/MainView";
 import Loading from "./components/Loading";
 
+import "./styles/components/ProfileCard.css";
+
 const theme = {
   global: {
     colors: {
-      brand: "#423fc2",
-      "accent-1": "#f0b347",
+      brand: "#191923",
+      "accent-1": "#0E79B2",
+      "accent-2": "#0E79B2",
+      "accent-3": "#0E79B2",
+      "accent-4": "#0E79B2",
     },
     font: {
       family: "Roboto",

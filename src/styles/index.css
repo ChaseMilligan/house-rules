@@ -1,27 +1,44 @@
 @font-face {
-  font-family: "sf_distant_galaxyregular";
-  src: url("sfdistantgalaxy-0l3d-webfont.woff2") format("woff2"),
-    url("sfdistantgalaxy-0l3d-webfont.woff") format("woff");
+  font-family: "Staatliches-Regular";
+  src: url("staatliches-regular-webfont.woff") format("woff"),
+    url("staatliches-regular-webfont.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
 }
 
-h1 {
-  font-family: "sf_distant_galaxyregular";
-  src: url("sfdistantgalaxy-0l3d-webfont.woff2") format("woff2"),
-    url("sfdistantgalaxy-0l3d-webfont.woff") format("woff");
+h1,
+h2 {
+  color: #191923;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Staatliches-Regular";
+  src: url("staatliches-regular-webfont.woff") format("woff"),
+    url("staatliches-regular-webfont.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
-  color: #423fc2;
 }
 
 h2 {
-  color: #f0b347;
   font-weight: 900;
-  font-size: 4em;
+  font-size: 8em;
+  line-height: 1em;
+  margin-block: 0.25em;
 }
 
 form {
   max-width: 400px;
   width: 80vw;
+}
+
+.container-fluid {
+  width: 90vw;
+}
+
+.nav-margin {
 }

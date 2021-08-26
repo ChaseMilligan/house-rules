@@ -7,9 +7,9 @@ export default function AppBar(props) {
       tag="header"
       direction="row"
       align="center"
-      justify="between"
+      justify="center"
       background="brand"
-      pad={{ left: "medium", right: "small", vertical: "small" }}
+      pad={{ left: "medium", right: "small", vertical: "medium" }}
       elevation="medium"
       style={{ zIndex: "1" }}
       {...props}

@@ -56,7 +56,7 @@ export async function getUserActiveRoom(userUid) {
         .doc(user.data().activeRoomUid)
         .get()
         .then((room) => {
-          res = room.data();
+          res = { ...room.data(), uid: room.id };
         })
         .catch((err) => {
           res = err;

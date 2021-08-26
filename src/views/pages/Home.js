@@ -1,8 +1,10 @@
-import { Box, TextInput, Button, Heading, Paragraph } from "grommet";
+import { Box, TextInput, Button, Heading } from "grommet";
 import { Bar, Aggregate } from "grommet-icons";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
+import ProfileCard from "../../components/ProfileCard";
 import { auth } from "../../config/firebase-config";
+import { getRndInteger } from "../../scripts/helpers";
 import { createRoom, getUserActiveRoom, joinRoom } from "../../service/Rooms";
 
 export default function Home() {
@@ -35,12 +37,14 @@ export default function Home() {
     setLoading(true);
     getUserActiveRoom(auth.currentUser.uid).then((room) => {
       if (room) {
-        console.log(room);
+        console.log(room.id);
         setRoom(room);
       }
       setLoading(false);
     });
   }, []);
+
+  console.log(room);
 
   if (loading) {
     return <Loading />;
@@ -50,12 +54,15 @@ export default function Home() {
     return (
       <Box fill flex align="center" justify="start">
         <h2>{room.code}</h2>
-        <Box fill flex align="center" justify="start">
-          <h3>Members</h3>
+        <div className="container-fluid">
           {room.members.map((member) => (
-            <Paragraph>{member.name}</Paragraph>
+            <ProfileCard
+              name={member.name}
+              winLoss={getRndInteger(35, 65)}
+              homeOwner={member.uid === room.uid ? true : false}
+            />
           ))}
-        </Box>
+        </div>
       </Box>
     );
   }

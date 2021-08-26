@@ -4,9 +4,10 @@ import {
   FormClose,
   Logout,
   Menu,
-  Notification,
-  ChatOption,
+  Notes,
+  Trophy,
   Home as House,
+  UserSettings,
 } from "grommet-icons";
 import AppBar from "../components/AppBar";
 import { auth } from "../config/firebase-config";
@@ -38,9 +39,13 @@ export default function MainView() {
         <Heading level="3" margin="none">
           House Rules
         </Heading>
-        <Button icon={<Menu />} onClick={() => setShowSidebar(!showSidebar)} />
       </AppBar>
-      <Box direction="row" flex overflow={{ horizontal: "hidden" }}>
+      <Box
+        className="nav-margin"
+        direction="row"
+        flex
+        overflow={{ horizontal: "hidden" }}
+      >
         <Switch>
           <Route exact path="/profile">
             <Profile />
@@ -94,9 +99,13 @@ export default function MainView() {
         )}
       </Box>
       <Nav direction="row" background="brand" pad="medium" justify="around">
-        <Anchor icon={<Notification />} hoverIndicator />
-        <Anchor icon={<House />} hoverIndicator />
-        <Anchor icon={<ChatOption />} hoverIndicator />
+        <Anchor href="/rules" icon={<Notes />} hoverIndicator />
+
+        <Anchor href="/" icon={<House />} hoverIndicator />
+
+        <Anchor href="/games" icon={<Trophy />} hoverIndicator />
+
+        <Anchor href="/profile" icon={<UserSettings />} hoverIndicator />
       </Nav>
     </>
   );
