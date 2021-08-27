@@ -23,13 +23,14 @@ export default function SignIn() {
     emailPassAuth(email, password);
     setLoading(false);
   }
+
   return (
-    <Box flex align="center" justify="center">
+    <Box flex align="center" justify="center" pad="2em">
       <Box height="small" width="small">
         <Image fit="contain" src={logo} />
       </Box>
       <h1>House rules</h1>
-      <Box margin="4em 0px">
+      <Box className="form-container" margin="1em 0px">
         <Form
           value={value}
           onChange={(nextValue) => setValue(nextValue)}
@@ -53,32 +54,32 @@ export default function SignIn() {
             <a href="#">Forgot Password?</a>
           </Box>
         </Form>
+        <Box flex="shrink" pad="1em 0px" direction="column">
+          <Button
+            primary
+            label="Sign in with Google"
+            icon={<Google />}
+            onClick={() => handleAuthClick(googleProvider)}
+            margin=".5em 0px"
+          />
+          <Link to="/create-user">
+            <Box flex="shrink" direction="column">
+              <Button
+                secondary
+                label="Create Account"
+                icon={<UserNew />}
+                onClick={() => console.log("")}
+                margin=".5em 0px"
+              />
+            </Box>
+          </Link>
+        </Box>
+        <Switch>
+          <Route path="/create-user">
+            <CreateUser />
+          </Route>
+        </Switch>
       </Box>
-      <Box flex="shrink" direction="column">
-        <Button
-          primary
-          label="Sign in with Google"
-          icon={<Google />}
-          onClick={() => handleAuthClick(googleProvider)}
-          margin=".5em 0px"
-        />
-        <Link to="/create-user">
-          <Box flex="shrink" direction="column">
-            <Button
-              secondary
-              label="Create Account"
-              icon={<UserNew />}
-              onClick={() => console.log("")}
-              margin=".5em 0px"
-            />
-          </Box>
-        </Link>
-      </Box>
-      <Switch>
-        <Route path="/create-user">
-          <CreateUser />
-        </Route>
-      </Switch>
     </Box>
   );
 }

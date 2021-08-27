@@ -41,5 +41,7 @@ form {
   width: 90vw;
 }
 
-.nav-margin {
+.form-container {
+  min-width: auto !important;
+  min-height: auto !important;
 }

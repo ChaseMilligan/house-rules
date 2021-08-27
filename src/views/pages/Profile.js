@@ -47,7 +47,7 @@ export default function Profile() {
   }
 
   return (
-    <Box flex align="center" justify="center">
+    <Box flex align="center" justify="start" pad="2em">
       {user ? (
         <div className="container-fluid">
           <Box flex align="center" justify="center">
@@ -82,15 +82,15 @@ export default function Profile() {
               icon={<CloudUpload />}
               onClick={() => handleUploadNewAvatar()}
             />
+            <Button
+              primary
+              margin="2em 0px"
+              size="large"
+              label="Sign Out"
+              icon={<Logout />}
+              onClick={() => handleSignOut()}
+            />
           </Box>
-          <Button
-            primary
-            margin="2em 0px"
-            size="large"
-            label="Sign Out"
-            icon={<Logout />}
-            onClick={() => handleSignOut()}
-          />
         </div>
       ) : (
         <p>no user found</p>

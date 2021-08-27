@@ -114,7 +114,7 @@ export default function Rules() {
                 {rules.map((rule, index) => (
                   <Box
                     className="rule-item"
-                    margin=".5em 0px"
+                    margin="1em 0px"
                     background="light-2"
                   >
                     <Box flex direction="row" align="center" justify="between">
@@ -167,7 +167,7 @@ export default function Rules() {
                 {rules.map((rule, index) => (
                   <Box
                     className="rule-item"
-                    margin=".5em 0px"
+                    margin="1em 0px"
                     background="light-2"
                   >
                     <Box flex direction="row" align="center" justify="between">

@@ -17,7 +17,7 @@ export default function ProfileCard(props) {
     <div className="profile-card-container">
       <Box flex direction="row" align="center" justify="around">
         <Paragraph>{props.name}</Paragraph>
-        {props.homeOwner && <Home />}
+        {props.homeOwner && <Home color="#0E79B2" />}
       </Box>
       <div className="profile-card-visuals">
         <Avatar src={props.avatarUrl} background="brand" size="xlarge">

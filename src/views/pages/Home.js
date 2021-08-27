@@ -79,7 +79,7 @@ export default function Home() {
             <ProfileCard
               name={member.name}
               winLoss={getRndInteger(35, 65)}
-              homeOwner={member.uid === room.uid ? true : false}
+              homeOwner={member.uid === room.roomOwner.uid ? true : false}
             />
           ))}
         </div>
