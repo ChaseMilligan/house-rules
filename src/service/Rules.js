@@ -4,7 +4,7 @@ export async function updateDefaultRules(userUid, rulesArray) {
   if (!userUid || !rulesArray) {
     return "error";
   }
-  const result = await db
+  await db
     .collection("users")
     .doc(userUid)
     .get()
@@ -17,5 +17,15 @@ export async function updateDefaultRules(userUid, rulesArray) {
     .catch((err) => {
       return err;
     });
-  console.log(result, "hehe");
+}
+
+export async function updateActiveRoomRules(roomCode, rulesArray) {
+  if (!roomCode || !rulesArray) {
+    return "error";
+  }
+  const result = await db
+    .collection("rooms")
+    .doc(roomCode)
+    .update({ rules: rulesArray });
+  console.log(result);
 }

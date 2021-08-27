@@ -12,7 +12,7 @@ import { auth } from "../../config/firebase-config";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import { getUserByUid } from "../../service/Users";
-import { updateDefaultRules } from "../../service/Rules";
+import { updateActiveRoomRules, updateDefaultRules } from "../../service/Rules";
 import { getUserActiveRoom } from "../../service/Rooms";
 
 export default function Rules() {
@@ -39,28 +39,33 @@ export default function Rules() {
 
   useEffect(async () => {
     setLoading(true);
-    await updateDefaultRules(auth.currentUser.uid, rules);
+    if (user && user.activeRoomUid) {
+      await updateActiveRoomRules(room.uid, rules);
+    } else {
+      await updateDefaultRules(auth.currentUser.uid, rules);
+    }
+
     setLoading(false);
   }, [rules]);
 
   useEffect(async () => {
     setLoading(true);
     const fetchedUser = await getUserByUid(auth.currentUser.uid);
-    setUser(fetchedUser);
     console.log(auth.currentUser.uid);
     await getUserActiveRoom(auth.currentUser.uid).then((activeRoom) => {
       console.log(activeRoom);
-      setRoom(activeRoom);
       if (activeRoom) {
-        setRules(activeRoom.roomOwner.defaultRules);
+        setRules(activeRoom.rules);
+        setRoom(activeRoom);
       } else {
         setRules(fetchedUser.defaultRules);
       }
-      setLoading(false);
     });
+    setUser(fetchedUser);
+    setLoading(false);
   }, []);
 
-  console.log(room);
+  console.log(room, user);
 
   if (loading || user === undefined) {
     return <Loading />;
@@ -69,9 +74,41 @@ export default function Rules() {
   return (
     <Box flex align="center" justify="start">
       <div className="rules-container container-fluid">
-        {room ? (
+        {user && user.activeRoomUid ? (
           <Box flex align="start" justify="center">
             <Heading level="2">Rules of the House</Heading>
+            {room.roomOwner.uid === auth.currentUser.uid && (
+              <Box flex margin="2em 0px" align="center" justify="center">
+                <Form
+                  value={value}
+                  onChange={(nextValue) => setValue(nextValue)}
+                  onReset={() => setValue()}
+                  onSubmit={handleSubmit}
+                >
+                  <FormField
+                    name="rule"
+                    htmlFor="text-input-id"
+                    label="New Rule"
+                  >
+                    <TextInput
+                      name="rule"
+                      id="text-area-id"
+                      placeholder="Add a new Rule..."
+                      value={value}
+                      onChange={(event) => setValue(event.target.value)}
+                    />
+                  </FormField>
+                  <Box direction="row" gap="medium">
+                    <Button
+                      type="submit"
+                      primary
+                      label="Add Rule"
+                      icon={<Add />}
+                    />
+                  </Box>
+                </Form>
+              </Box>
+            )}
             {rules && rules.length !== 0 && (
               <Box className="rules-list" margin="1em 0px" flex fill>
                 {rules.map((rule, index) => (
