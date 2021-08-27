@@ -81,7 +81,7 @@ export default function Rules() {
                 </Box>
               </Form>
             </Box>
-            {rules.length !== 0 && (
+            {rules && rules.length !== 0 && (
               <Box className="rules-list" margin="1em 0px" flex fill>
                 {rules.map((rule, index) => (
                   <Box
