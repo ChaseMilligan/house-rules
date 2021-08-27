@@ -5,15 +5,7 @@ const socialMediaAuth = (provider) => {
   auth
     .signInWithPopup(provider)
     .then(async (res) => {
-      getUserByUid(res.user.uid).then((result) => {
-        console.log("then", result);
-        if (!result.activeRoomUid) {
-          console.log("NOOOOOOO");
-          updateFirestore(res.user.email, res.user.displayName, res.user.uid);
-        }
-      });
-
-      return res.user;
+      updateFirestore(res.user.email, res.user.displayName, res.user.uid);
     })
     .catch((err) => {
       return err;
@@ -57,12 +49,24 @@ function updateFirestore(email, name, uid) {
 
   db.collection("users")
     .doc(uid)
-    .set(data)
-    .then(() => {
-      window.location.href = "/";
+    .get()
+    .then((user) => {
+      if (user.exists) {
+        return;
+      } else {
+        db.collection("users")
+          .doc(uid)
+          .set(data)
+          .then(() => {
+            window.location.href = "/";
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
     })
-    .catch((e) => {
-      console.log(e);
+    .catch((err) => {
+      return err;
     });
 }
 

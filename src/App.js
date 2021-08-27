@@ -9,6 +9,7 @@ import MainView from "./views/MainView";
 import Loading from "./components/Loading";
 
 import "./styles/components/ProfileCard.css";
+import "./styles/components/Rules.css";
 
 const theme = {
   global: {

@@ -15,6 +15,7 @@ import { Switch, Route, Link } from "react-router-dom";
 import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import Rules from "./pages/Rules";
+import Games from "./pages/Games";
 
 export default function MainView() {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -53,6 +54,9 @@ export default function MainView() {
           </Route>
           <Route exact path="/rules">
             <Rules />
+          </Route>
+          <Route exact path="/games">
+            <Games />
           </Route>
           <Route path="/">
             <Home />
