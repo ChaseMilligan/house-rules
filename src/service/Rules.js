@@ -4,7 +4,6 @@ export async function updateDefaultRules(userUid, rulesArray) {
   if (!userUid || !rulesArray) {
     return "error";
   }
-  console.log("hit 1");
   const result = await db
     .collection("users")
     .doc(userUid)
@@ -14,9 +13,9 @@ export async function updateDefaultRules(userUid, rulesArray) {
       db.collection("users")
         .doc(userUid)
         .set({ defaultRules: rulesArray }, { merge: true });
-      console.log(result);
     })
     .catch((err) => {
       return err;
     });
+  console.log(result, "hehe");
 }

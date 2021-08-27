@@ -9,7 +9,9 @@ export async function createRoom(userUid) {
     .collection("rooms")
     .doc(roomCode)
     .set({
+      roomOwner: { ...user, uid: userUid },
       members: [{ ...user, uid: userUid }],
+      rules: user.defaultRules,
       games: [],
     })
     .then(() => {
@@ -79,15 +81,19 @@ export async function getUserActiveRoom(userUid) {
         .get()
         .then((room) => {
           if (room.exists) {
+            console.log(userUid);
             res = { ...room.data(), uid: room.id };
+          } else {
+            console.log("not exists");
+            res = null;
           }
         })
         .catch((err) => {
-          res = null;
+          res = err;
         });
     })
     .catch((err) => {
-      res = null;
+      res = err;
     });
   return res;
 }

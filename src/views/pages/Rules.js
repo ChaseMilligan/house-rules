@@ -13,10 +13,12 @@ import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import { getUserByUid } from "../../service/Users";
 import { updateDefaultRules } from "../../service/Rules";
+import { getUserActiveRoom } from "../../service/Rooms";
 
 export default function Rules() {
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(undefined);
+  const [user, setUser] = useState();
+  const [room, setRoom] = useState();
   const [rules, setRules] = useState([]);
   const [errors, setErrors] = useState();
   const [value, setValue] = useState();
@@ -24,6 +26,14 @@ export default function Rules() {
   async function handleSubmit({ value }) {
     setLoading(true);
     setRules([...rules, value]);
+    setValue(null);
+    setLoading(false);
+  }
+
+  async function handleDeleteDefaultRule(ruleToRemove) {
+    setLoading(true);
+    const filteredRules = rules.filter((rule) => rule !== ruleToRemove);
+    setRules(filteredRules);
     setLoading(false);
   }
 
@@ -37,9 +47,20 @@ export default function Rules() {
     setLoading(true);
     const fetchedUser = await getUserByUid(auth.currentUser.uid);
     setUser(fetchedUser);
-    setRules(fetchedUser.defaultRules);
-    setLoading(false);
+    console.log(auth.currentUser.uid);
+    await getUserActiveRoom(auth.currentUser.uid).then((activeRoom) => {
+      console.log(activeRoom);
+      setRoom(activeRoom);
+      if (activeRoom) {
+        setRules(activeRoom.roomOwner.defaultRules);
+      } else {
+        setRules(fetchedUser.defaultRules);
+      }
+      setLoading(false);
+    });
   }, []);
+
+  console.log(room);
 
   if (loading || user === undefined) {
     return <Loading />;
@@ -48,9 +69,32 @@ export default function Rules() {
   return (
     <Box flex align="center" justify="start">
       <div className="rules-container container-fluid">
-        {user && user.activeRoomUid ? (
+        {room ? (
           <Box flex align="start" justify="center">
             <Heading level="2">Rules of the House</Heading>
+            {rules && rules.length !== 0 && (
+              <Box className="rules-list" margin="1em 0px" flex fill>
+                {rules.map((rule, index) => (
+                  <Box
+                    className="rule-item"
+                    margin=".5em 0px"
+                    background="light-2"
+                  >
+                    <Box flex direction="row" align="center" justify="between">
+                      <Heading level="2">{index + 1}.</Heading>
+                      {room.roomOwner.uid === auth.currentUser.uid && (
+                        <Button
+                          size="large"
+                          icon={<Trash color="#FF4040" />}
+                          onClick={() => handleDeleteDefaultRule(rule)}
+                        />
+                      )}
+                    </Box>
+                    <Paragraph>{rule}</Paragraph>
+                  </Box>
+                ))}
+              </Box>
+            )}
           </Box>
         ) : (
           <Box flex align="start" justify="center">
@@ -91,7 +135,11 @@ export default function Rules() {
                   >
                     <Box flex direction="row" align="center" justify="between">
                       <Heading level="2">{index + 1}.</Heading>
-                      <Button size="large" icon={<Trash color="#FF4040" />} />
+                      <Button
+                        size="large"
+                        icon={<Trash color="#FF4040" />}
+                        onClick={() => handleDeleteDefaultRule(rule)}
+                      />
                     </Box>
                     <Paragraph>{rule}</Paragraph>
                   </Box>
