@@ -33,6 +33,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(null);
 
   useEffect(() => {
+    //document.body.requestFullscreen();
     setLoading(true);
     auth.onAuthStateChanged((user) => {
       if (user) {

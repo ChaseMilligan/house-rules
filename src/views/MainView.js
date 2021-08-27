@@ -37,11 +37,15 @@ export default function MainView() {
 
   return (
     <>
-      <AppBar>
-        <Heading level="3" margin="none">
-          House Rules
-        </Heading>
-      </AppBar>
+      <Nav direction="row" background="brand" pad="medium" justify="around">
+        <Anchor href="/rules" icon={<Notes />} hoverIndicator />
+
+        <Anchor href="/" icon={<House />} hoverIndicator />
+
+        <Anchor href="/games" icon={<Trophy />} hoverIndicator />
+
+        <Anchor href="/profile" icon={<UserSettings />} hoverIndicator />
+      </Nav>
       <Box
         className="nav-margin"
         direction="row"
@@ -106,15 +110,6 @@ export default function MainView() {
           </Layer>
         )}
       </Box>
-      <Nav direction="row" background="brand" pad="medium" justify="around">
-        <Anchor href="/rules" icon={<Notes />} hoverIndicator />
-
-        <Anchor href="/" icon={<House />} hoverIndicator />
-
-        <Anchor href="/games" icon={<Trophy />} hoverIndicator />
-
-        <Anchor href="/profile" icon={<UserSettings />} hoverIndicator />
-      </Nav>
     </>
   );
 }
