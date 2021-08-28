@@ -70,27 +70,33 @@ export async function leaveRoom(userUid) {
 
 export async function getUserActiveRoom(userUid) {
   let res = null;
+  console.log(userUid);
   await db
     .collection("users")
     .doc(userUid)
     .get()
     .then(async (user) => {
-      await db
-        .collection("rooms")
-        .doc(user.data().activeRoomUid)
-        .get()
-        .then((room) => {
-          if (room.exists) {
-            console.log(userUid);
-            res = { ...room.data(), uid: room.id };
-          } else {
-            console.log("not exists");
-            res = null;
-          }
-        })
-        .catch((err) => {
-          res = err;
-        });
+      console.log(user.data());
+      if (user.data().activeRoomUid) {
+        await db
+          .collection("rooms")
+          .doc(user.data().activeRoomUid)
+          .get()
+          .then((room) => {
+            if (room.exists) {
+              console.log(userUid);
+              res = { ...room.data(), uid: room.id };
+            } else {
+              console.log("not exists");
+              res = null;
+            }
+          })
+          .catch((err) => {
+            res = err;
+          });
+      } else {
+        res = null;
+      }
     })
     .catch((err) => {
       res = err;

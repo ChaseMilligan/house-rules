@@ -64,7 +64,8 @@ export default function Home() {
     return <Loading />;
   }
 
-  if (room !== null) {
+  if (room) {
+    console.log(room);
     return (
       <Box fill flex align="center" justify="start">
         <h2>{room.uid}</h2>

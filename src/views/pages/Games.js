@@ -1,5 +1,5 @@
-import { Avatar, Box, Button, Heading, FileInput } from "grommet";
-import { Logout, CloudUpload } from "grommet-icons";
+import { Tabs, Box, Button, Heading, Tab } from "grommet";
+import { UserAdd, CloudUpload } from "grommet-icons";
 import { auth } from "../../config/firebase-config";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
@@ -22,9 +22,21 @@ export default function Games() {
   }
 
   return (
-    <Box flex align="center" justify="start">
-      <div className="rules-container container-fluid">
-        <Heading>Games</Heading>
+    <Box flex align="center" justify="start" pad="medium">
+      <div className="games-container container-fluid">
+        <Box fill flex align="start" justify="start">
+          <Tabs>
+            <Tab title="Find Duo">
+              <Box pad="medium">One</Box>
+            </Tab>
+            <Tab title="Teams">
+              <Box pad="medium">Two</Box>
+            </Tab>
+            <Tab title="Matches">
+              <Box pad="medium">Three</Box>
+            </Tab>
+          </Tabs>
+        </Box>
       </div>
     </Box>
   );
