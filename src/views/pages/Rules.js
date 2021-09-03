@@ -39,12 +39,15 @@ export default function Rules() {
 
   useEffect(async () => {
     setLoading(true);
-    if (user && user.activeRoomUid) {
+    if (!user) {
+      return;
+    }
+    if (user.activeRoomUid) {
       await updateActiveRoomRules(room.uid, rules);
     } else {
       await updateDefaultRules(auth.currentUser.uid, rules);
     }
-
+    console.log(user);
     setLoading(false);
   }, [rules]);
 
@@ -62,6 +65,7 @@ export default function Rules() {
       }
     });
     setUser(fetchedUser);
+    console.log(user);
     setLoading(false);
   }, []);
 

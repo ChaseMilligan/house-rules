@@ -76,7 +76,6 @@ export async function getUserActiveRoom(userUid) {
     .doc(userUid)
     .get()
     .then(async (user) => {
-      console.log(user.data());
       if (user.data().activeRoomUid) {
         await db
           .collection("rooms")
