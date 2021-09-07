@@ -30,6 +30,7 @@ export default function Home() {
     setLoading(true);
     await joinRoom(auth.currentUser.uid, codeValue);
     getUserActiveRoom(auth.currentUser.uid).then((room) => {
+      console.log(room);
       setRoom(room);
       setCodeValue(null);
       setLoading(false);
@@ -96,7 +97,9 @@ export default function Home() {
             <TextInput
               placeholder="Enter House Code here..."
               value={codeValue}
-              onChange={(event) => setCodeValue(event.target.value)}
+              onChange={(event) =>
+                setCodeValue(event.target.value.toUpperCase())
+              }
             />
             <Button
               margin=".5em 0px"

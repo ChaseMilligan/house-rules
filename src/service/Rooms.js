@@ -11,8 +11,6 @@ export async function createRoom(userUid) {
     .set({
       roomOwner: { ...user, uid: userUid },
       members: [{ ...user, uid: userUid }],
-      rules: user.defaultRules,
-      games: [],
     })
     .then(() => {
       db.collection("users").doc(userUid).update({ activeRoomUid: roomCode });

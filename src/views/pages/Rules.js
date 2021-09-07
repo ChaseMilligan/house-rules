@@ -49,7 +49,7 @@ export default function Rules() {
     const fetchedUser = await getUserByUid(auth.currentUser.uid);
     await getUserActiveRoom(auth.currentUser.uid).then(async (activeRoom) => {
       if (activeRoom) {
-        if (fetchedUser.uid === activeRoom.roomOwner.uid) {
+        if (auth.currentUser.uid === activeRoom.roomOwner.uid) {
           setCanEdit(true);
         }
         const ownerRuleSets = await getUserRuleSets(activeRoom.roomOwner.uid);
@@ -68,6 +68,8 @@ export default function Rules() {
   if (loading || user === undefined) {
     return <Loading />;
   }
+
+  console.log(canEdit);
 
   return (
     <Box flex align="center" justify="start">

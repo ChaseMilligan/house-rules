@@ -28,6 +28,7 @@ export default function RuleSetModal(props) {
     console.log(value);
     const newRules = [...rules, value];
     await overwriteRules(auth.currentUser.uid, props.ruleSet, newRules);
+    setValue("");
     setRules(newRules);
   }
 
@@ -72,17 +73,20 @@ export default function RuleSetModal(props) {
               >
                 <Box flex direction="row" align="center" justify="between">
                   <Heading level="2">{index + 1}.</Heading>
-                  <Button
-                    size="large"
-                    icon={<Trash color="status-critical" />}
-                    onClick={() => handleDeleteRule(rule)}
-                  />
+                  {props.canEdit && (
+                    <Button
+                      size="large"
+                      icon={<Trash color="status-critical" />}
+                      onClick={() => handleDeleteRule(rule)}
+                    />
+                  )}
                 </Box>
                 <Paragraph>{rule}</Paragraph>
               </Box>
             ))}
-          {props.canEdit && (
-            <Box flex="grow" pad="1em 0em">
+
+          <Box flex="grow" pad="1em 0em">
+            {props.canEdit && (
               <Button
                 margin=".5em 0px"
                 primary
@@ -92,8 +96,8 @@ export default function RuleSetModal(props) {
                 icon={<Trash />}
                 onClick={() => props.handleDeleteRuleSet(props.ruleSet)}
               />
-            </Box>
-          )}
+            )}
+          </Box>
         </Box>
       </Box>
     </Layer>
