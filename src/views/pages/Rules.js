@@ -1,75 +1,69 @@
-import {
-  TextInput,
-  Box,
-  Button,
-  Heading,
-  Form,
-  FormField,
-  Paragraph,
-} from "grommet";
-import { Add, Trash } from "grommet-icons";
+import { Box, Button, Heading } from "grommet";
+import { Add } from "grommet-icons";
 import { auth } from "../../config/firebase-config";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import { getUserByUid } from "../../service/Users";
-import { updateActiveRoomRules, updateDefaultRules } from "../../service/Rules";
+import {
+  createRuleSet,
+  deleteRuleSet,
+  getUserRuleSets,
+} from "../../service/Rules";
 import { getUserActiveRoom } from "../../service/Rooms";
+import AddModal from "../../components/Rules/AddModal";
+import RuleSetList from "../../components/Rules/RuleSetList";
 
 export default function Rules() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState();
   const [room, setRoom] = useState();
-  const [rules, setRules] = useState([]);
-  const [errors, setErrors] = useState();
-  const [value, setValue] = useState();
+  const [ruleSets, setRuleSets] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
 
-  async function handleSubmit({ value }) {
+  async function handleCreateNewSet(name, rules) {
     setLoading(true);
-    setRules([...rules, value]);
-    setValue(null);
+    console.log(name, rules);
+    await createRuleSet(auth.currentUser.uid, name, rules);
+    const userRuleSets = await getUserRuleSets(auth.currentUser.uid);
+    console.log(userRuleSets);
+    setRuleSets(userRuleSets);
+    setShowAddModal(false);
     setLoading(false);
   }
 
-  async function handleDeleteDefaultRule(ruleToRemove) {
+  async function handleDeleteRuleSet(ruleSet) {
     setLoading(true);
-    const filteredRules = rules.filter((rule) => rule !== ruleToRemove);
-    setRules(filteredRules);
+    await deleteRuleSet(auth.currentUser.uid, ruleSet);
+    const userRuleSets = await getUserRuleSets(auth.currentUser.uid);
+    setRuleSets(userRuleSets);
     setLoading(false);
   }
 
-  useEffect(async () => {
-    setLoading(true);
-    if (!user) {
-      return;
-    }
-    if (user.activeRoomUid) {
-      await updateActiveRoomRules(room.uid, rules);
-    } else {
-      await updateDefaultRules(auth.currentUser.uid, rules);
-    }
-    console.log(user);
-    setLoading(false);
-  }, [rules]);
+  function onModalClose() {
+    setShowAddModal(false);
+  }
 
   useEffect(async () => {
     setLoading(true);
     const fetchedUser = await getUserByUid(auth.currentUser.uid);
-    console.log(auth.currentUser.uid);
-    await getUserActiveRoom(auth.currentUser.uid).then((activeRoom) => {
-      console.log(activeRoom);
+    await getUserActiveRoom(auth.currentUser.uid).then(async (activeRoom) => {
       if (activeRoom) {
-        setRules(activeRoom.rules);
+        if (fetchedUser.uid === activeRoom.roomOwner.uid) {
+          setCanEdit(true);
+        }
+        const ownerRuleSets = await getUserRuleSets(activeRoom.roomOwner.uid);
+        setRuleSets(ownerRuleSets);
         setRoom(activeRoom);
       } else {
-        setRules(fetchedUser.defaultRules);
+        setCanEdit(true);
+        const userRuleSets = await getUserRuleSets(auth.currentUser.uid);
+        setRuleSets(userRuleSets);
       }
     });
     setUser(fetchedUser);
-    console.log(user);
     setLoading(false);
   }, []);
-
-  console.log(room, user);
 
   if (loading || user === undefined) {
     return <Loading />;
@@ -81,111 +75,35 @@ export default function Rules() {
         {user && user.activeRoomUid ? (
           <Box flex align="start" justify="center">
             <Heading level="2">Rules of the House</Heading>
-            {room.roomOwner.uid === auth.currentUser.uid && (
-              <Box flex margin="2em 0px" align="center" justify="center">
-                <Form
-                  value={value}
-                  onChange={(nextValue) => setValue(nextValue)}
-                  onReset={() => setValue()}
-                  onSubmit={handleSubmit}
-                >
-                  <FormField
-                    name="rule"
-                    htmlFor="text-input-id"
-                    label="New Rule"
-                  >
-                    <TextInput
-                      name="rule"
-                      id="text-area-id"
-                      placeholder="Add a new Rule..."
-                      value={value}
-                      onChange={(event) => setValue(event.target.value)}
-                    />
-                  </FormField>
-                  <Box direction="row" gap="medium">
-                    <Button
-                      type="submit"
-                      primary
-                      label="Add Rule"
-                      icon={<Add />}
-                    />
-                  </Box>
-                </Form>
-              </Box>
-            )}
-            {rules && rules.length !== 0 && (
-              <Box className="rules-list" margin="1em 0px" flex fill>
-                {rules.map((rule, index) => (
-                  <Box
-                    className="rule-item"
-                    margin="1em 0px"
-                    background="light-2"
-                  >
-                    <Box flex direction="row" align="center" justify="between">
-                      <Heading level="2">{index + 1}.</Heading>
-                      {room.roomOwner.uid === auth.currentUser.uid && (
-                        <Button
-                          size="large"
-                          icon={<Trash color="#FF4040" />}
-                          onClick={() => handleDeleteDefaultRule(rule)}
-                        />
-                      )}
-                    </Box>
-                    <Paragraph>{rule}</Paragraph>
-                  </Box>
-                ))}
-              </Box>
+            {ruleSets && ruleSets.length !== 0 && (
+              <RuleSetList ruleSets={ruleSets} canEdit={canEdit} />
             )}
           </Box>
         ) : (
           <Box flex align="start" justify="center">
-            <Heading level="2">Your Default House Rules</Heading>
-            <Box flex margin="2em 0px" align="center" justify="center">
-              <Form
-                value={value}
-                onChange={(nextValue) => setValue(nextValue)}
-                onReset={() => setValue()}
-                onSubmit={handleSubmit}
-              >
-                <FormField name="rule" htmlFor="text-input-id" label="New Rule">
-                  <TextInput
-                    name="rule"
-                    id="text-area-id"
-                    placeholder="Add a new Rule..."
-                    value={value}
-                    onChange={(event) => setValue(event.target.value)}
-                  />
-                </FormField>
-                <Box direction="row" gap="medium">
-                  <Button
-                    type="submit"
-                    primary
-                    label="Add Rule"
-                    icon={<Add />}
-                  />
-                </Box>
-              </Form>
+            {showAddModal && (
+              <AddModal
+                onModalClose={onModalClose}
+                onSubmit={handleCreateNewSet}
+              />
+            )}
+            <Box flex fill direction="row" align="center" justify="between">
+              <Heading level="2">Your Rule Sets</Heading>
+              <Button
+                primary
+                onClick={() => setShowAddModal(true)}
+                size="small"
+                gap="xxsmall"
+                label="New"
+                icon={<Add />}
+              />
             </Box>
-            {rules && rules.length !== 0 && (
-              <Box className="rules-list" margin="1em 0px" flex fill>
-                {rules.map((rule, index) => (
-                  <Box
-                    className="rule-item"
-                    margin="1em 0px"
-                    background="light-2"
-                  >
-                    <Box flex direction="row" align="center" justify="between">
-                      <Heading level="2">{index + 1}.</Heading>
-                      <Button
-                        size="large"
-                        icon={<Trash color="#FF4040" />}
-                        onClick={() => handleDeleteDefaultRule(rule)}
-                      />
-                    </Box>
-                    <Paragraph>{rule}</Paragraph>
-                  </Box>
-                ))}
-              </Box>
+            {ruleSets && ruleSets.length !== 0 && (
+              <RuleSetList
+                ruleSets={ruleSets}
+                canEdit={canEdit}
+                handleDeleteRuleSet={handleDeleteRuleSet}
+              />
             )}
           </Box>
         )}

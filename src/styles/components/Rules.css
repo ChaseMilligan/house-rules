@@ -1,3 +1,11 @@
+.rules-list {
+  max-height: 40vh;
+  overflow-y: scroll;
+  padding-inline: 1em;
+  margin-bottom: 1em;
+  position: relative;
+}
+
 .rule-item {
   padding: 1em;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
