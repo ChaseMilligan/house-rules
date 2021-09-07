@@ -1,5 +1,5 @@
-import { Tabs, Box, Button, Heading, Tab } from "grommet";
-import { UserAdd, CloudUpload } from "grommet-icons";
+import { Heading, Box, Button, Paragraph, Avatar } from "grommet";
+import { Add } from "grommet-icons";
 import { auth } from "../../config/firebase-config";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
@@ -24,18 +24,41 @@ export default function Games() {
   return (
     <Box flex align="center" justify="start" pad="medium">
       <div className="games-container container-fluid">
-        <Box fill flex align="start" justify="start">
-          <Tabs>
-            <Tab title="Find Duo">
-              <Box pad="medium">One</Box>
-            </Tab>
-            <Tab title="Teams">
-              <Box pad="medium">Two</Box>
-            </Tab>
-            <Tab title="Matches">
-              <Box pad="medium">Three</Box>
-            </Tab>
-          </Tabs>
+        <Box flex align="center" justify="start">
+          <Button
+            primary
+            size="medium"
+            label="Add Ranked Table"
+            icon={<Add />}
+            onClick={() => console.log("start")}
+          />
+        </Box>
+        <Box
+          pad=".5em 0px"
+          margin="1em 0px"
+          align="center"
+          background="light-4"
+        >
+          <Heading level="2">CODE (RANKED)</Heading>
+          <Box
+            fill
+            flex="grow"
+            direction="column"
+            align="center"
+            justify="between"
+          >
+            <Box flex fill direction="row" align="center" justify="around">
+              <Heading level="3">Player 1</Heading>
+              <Heading level="3">&</Heading>
+              <Heading level="3">Player 2</Heading>
+            </Box>
+            <Heading level="1">VS</Heading>
+            <Box flex fill direction="row" align="center" justify="around">
+              <Heading level="3">Player 3</Heading>
+              <Heading level="3">&</Heading>
+              <Heading level="3">Player 4</Heading>
+            </Box>
+          </Box>
         </Box>
       </div>
     </Box>

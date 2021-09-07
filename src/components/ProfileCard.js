@@ -20,7 +20,11 @@ export default function ProfileCard(props) {
         {props.homeOwner && <Home color="#0E79B2" />}
       </Box>
       <div className="profile-card-visuals">
-        <Avatar src={props.avatarUrl} background="brand" size="xlarge">
+        <Avatar
+          src={props.avatarUrl}
+          background="brand"
+          size={props.size || "xlarge"}
+        >
           {props.name[0]}
         </Avatar>
         {props.winLoss ? (

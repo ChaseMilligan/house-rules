@@ -2,6 +2,7 @@ import firebase from "firebase";
 import "firebase/firestore";
 import "firebase/auth";
 import "firebase/storage";
+import "firebase/functions";
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
@@ -16,5 +17,8 @@ var firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+
+const admin = require("firebase-admin");
+admin.initializeApp();
 
 export default firebase;
