@@ -42,35 +42,52 @@ export default function Home() {
   async function handleLeaveRoom() {
     setLoading(true);
     await leaveRoom(auth.currentUser.uid);
-    getUserActiveRoom(auth.currentUser.uid).then((room) => {
-      console.log(room);
-      setRoom(room);
-      setLoading(false);
-    });
+    setRoom(null);
     setLoading(false);
   }
+
+  useEffect(() => {
+    if (members.length === 0) {
+      getUserActiveRoom(auth.currentUser.uid).then((room) => {
+        console.log(room);
+        setRoom(room);
+        setCodeValue(null);
+        setLoading(false);
+      });
+    }
+  }, [members]);
+
+  useEffect(() => {
+    if (!room) {
+      return;
+    }
+    db.collection("rooms")
+      .doc(room.uid)
+      .collection("members")
+      .orderBy("name")
+      .limit(25)
+      .onSnapshot((snapshot) => {
+        setMembers(snapshot.docs.map((doc) => doc.data()));
+      });
+  }, [room]);
 
   useEffect(() => {
     setLoading(true);
     getUserActiveRoom(auth.currentUser.uid).then((room) => {
       if (room) {
         setRoom(room);
-        db.collection('rooms').doc(room.uid).collection('members').orderBy('name').limit(25).onSnapshot((snapshot) => {
-          setMembers(snapshot.docs.map(doc => doc.data()))
-        });
       }
       setLoading(false);
     });
   }, []);
 
-  console.log(members);
+  console.log(members, room);
 
   if (loading) {
     return <Loading />;
   }
 
-  if (room) {
-    console.log(room);
+  if (room && members) {
     return (
       <Box fill flex align="center" justify="start">
         <h2>{room.uid}</h2>
@@ -83,6 +100,7 @@ export default function Home() {
         <div className="container-fluid">
           {members.map((member) => (
             <ProfileCard
+              key={member.uid}
               name={member.name}
               winLoss={getRndInteger(35, 65)}
               homeOwner={member.uid === room.roomOwner.uid ? true : false}

@@ -3,20 +3,29 @@ import { getRoomCode } from "../scripts/helpers";
 import { getUserByUid } from "./Users";
 
 export async function createRoom(userUid) {
-  const user = await getUserByUid(userUid);
   const roomCode = getRoomCode();
+  await db.collection("users").doc(userUid).update({ activeRoomUid: roomCode });
+  const user = await getUserByUid(userUid);
+  const timeStamp = new Date().getTime();
   await db
     .collection("rooms")
     .doc(roomCode)
     .set({
-      roomOwner: { ...user, uid: userUid }
+      roomOwner: { ...user, uid: userUid },
+      createdAt: timeStamp,
     })
     .then(() => {
       db.collection("rooms")
         .doc(roomCode)
-        .collection('members')
-        .add({ ...user, uid: userUid });
-      db.collection("users").doc(userUid).update({ activeRoomUid: roomCode });
+        .collection("members")
+        .doc(userUid)
+        .set({ ...user, uid: userUid })
+        .then(() => {
+          db.collection("rooms")
+            .doc(roomCode)
+            .collection("games")
+            .add({ createdAt: timeStamp, team1: [], team2: [] });
+        });
     })
     .catch((err) => {
       return err;
@@ -33,7 +42,7 @@ export async function joinRoom(userUid, houseCode) {
       console.log(room.data(), room.id);
       db.collection("rooms")
         .doc(room.id)
-        .collection('members')
+        .collection("members")
         .add({ ...user, uid: userUid });
       db.collection("users").doc(userUid).update({
         activeRoomUid: room.id,
@@ -49,23 +58,12 @@ export async function leaveRoom(userUid) {
   await db
     .collection("rooms")
     .doc(user.activeRoomUid)
-    .get()
-    .then((room) => {
-      console.log("here");
-      const filteredMembers = room.data().members.filter((member) => {
-        console.log("hehe", member);
-        return member.uid !== userUid;
-      });
-      console.log(filteredMembers);
-      db.collection("rooms").doc(room.id).update({ members: filteredMembers });
-      db.collection("users").doc(userUid).update({
-        activeRoomUid: "",
-      });
-    })
-    .catch((err) => {
-      console.log("fail");
-      return err;
-    });
+    .collection("members")
+    .doc(userUid)
+    .delete();
+  db.collection("users").doc(userUid).update({
+    activeRoomUid: "",
+  });
 }
 
 export async function getUserActiveRoom(userUid) {

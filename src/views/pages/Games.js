@@ -24,22 +24,13 @@ export default function Games() {
   return (
     <Box flex align="center" justify="start" pad="medium">
       <div className="games-container container-fluid">
-        <Box flex align="center" justify="start">
-          <Button
-            primary
-            size="medium"
-            label="Add Ranked Table"
-            icon={<Add />}
-            onClick={() => console.log("start")}
-          />
-        </Box>
         <Box
           pad=".5em 0px"
           margin="1em 0px"
           align="center"
           background="light-4"
         >
-          <Heading level="2">CODE (RANKED)</Heading>
+          <Heading level="2">Table 1</Heading>
           <Box
             fill
             flex="grow"
@@ -59,6 +50,42 @@ export default function Games() {
               <Heading level="3">Player 4</Heading>
             </Box>
           </Box>
+        </Box>
+        <Box
+          pad=".5em 0px"
+          margin="1em 0px"
+          align="center"
+          background="light-4"
+        >
+          <Heading level="2">Table 1</Heading>
+          <Box
+            fill
+            flex="grow"
+            direction="column"
+            align="center"
+            justify="between"
+          >
+            <Box flex fill direction="row" align="center" justify="around">
+              <Heading level="3">Player 1</Heading>
+              <Heading level="3">&</Heading>
+              <Heading level="3">Player 2</Heading>
+            </Box>
+            <Heading level="1">VS</Heading>
+            <Box flex fill direction="row" align="center" justify="around">
+              <Heading level="3">Player 3</Heading>
+              <Heading level="3">&</Heading>
+              <Heading level="3">Player 4</Heading>
+            </Box>
+          </Box>
+        </Box>
+        <Box flex align="center" justify="start">
+          <Button
+            primary
+            size="medium"
+            label="Add Ranked Table"
+            icon={<Add />}
+            onClick={() => console.log("start")}
+          />
         </Box>
       </div>
     </Box>
