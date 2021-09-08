@@ -9,10 +9,13 @@ export async function createRoom(userUid) {
     .collection("rooms")
     .doc(roomCode)
     .set({
-      roomOwner: { ...user, uid: userUid },
-      members: [{ ...user, uid: userUid }],
+      roomOwner: { ...user, uid: userUid }
     })
     .then(() => {
+      db.collection("rooms")
+        .doc(roomCode)
+        .collection('members')
+        .add({ ...user, uid: userUid });
       db.collection("users").doc(userUid).update({ activeRoomUid: roomCode });
     })
     .catch((err) => {
@@ -30,9 +33,8 @@ export async function joinRoom(userUid, houseCode) {
       console.log(room.data(), room.id);
       db.collection("rooms")
         .doc(room.id)
-        .update({
-          members: [...room.data().members, { ...user, uid: userUid }],
-        });
+        .collection('members')
+        .add({ ...user, uid: userUid });
       db.collection("users").doc(userUid).update({
         activeRoomUid: room.id,
       });

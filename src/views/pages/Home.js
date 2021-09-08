@@ -3,7 +3,7 @@ import { Bar, Aggregate, Run } from "grommet-icons";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import ProfileCard from "../../components/ProfileCard";
-import { auth } from "../../config/firebase-config";
+import { auth, db } from "../../config/firebase-config";
 import { getRndInteger } from "../../scripts/helpers";
 import {
   createRoom,
@@ -16,6 +16,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [room, setRoom] = useState(null);
   const [codeValue, setCodeValue] = useState(null);
+  const [members, setMembers] = useState([]);
 
   async function handleCreateRoom() {
     setLoading(true);
@@ -54,12 +55,15 @@ export default function Home() {
     getUserActiveRoom(auth.currentUser.uid).then((room) => {
       if (room) {
         setRoom(room);
+        db.collection('rooms').doc(room.uid).collection('members').orderBy('name').limit(25).onSnapshot((snapshot) => {
+          setMembers(snapshot.docs.map(doc => doc.data()))
+        });
       }
       setLoading(false);
     });
   }, []);
 
-  console.log(room);
+  console.log(members);
 
   if (loading) {
     return <Loading />;
@@ -77,7 +81,7 @@ export default function Home() {
           onClick={handleLeaveRoom}
         />
         <div className="container-fluid">
-          {room.members.map((member) => (
+          {members.map((member) => (
             <ProfileCard
               name={member.name}
               winLoss={getRndInteger(35, 65)}
