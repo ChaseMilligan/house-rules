@@ -1,19 +1,36 @@
-import { Heading, Box, Button, Paragraph, Avatar } from "grommet";
+import { Box, Button } from "grommet";
 import { Add } from "grommet-icons";
-import { auth } from "../../config/firebase-config";
+import { auth, db } from "../../config/firebase-config";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import { getUserByUid } from "../../service/Users";
+import { createTable } from "../../service/Games";
+import { getUserActiveRoom } from "../../service/Rooms";
+import Table from "./../../components/Games/Table";
 
 export default function Games() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState();
+  const [room, setRoom] = useState(null);
+  const [tables, setTables] = useState([]);
 
   useEffect(() => {
     setLoading(true);
     getUserByUid(auth.currentUser.uid).then((data) => {
       setUser(data);
-      setLoading(false);
+      getUserActiveRoom(auth.currentUser.uid).then((room) => {
+        setRoom(room);
+
+        db.collection("rooms")
+          .doc(data.activeRoomUid)
+          .collection("games")
+          .orderBy("createdAt")
+          .limit(25)
+          .onSnapshot(async (snapshot) => {
+            setTables(snapshot.docs.map((table) => table.id));
+            setLoading(false);
+          });
+      });
     });
   }, []);
 
@@ -23,69 +40,27 @@ export default function Games() {
 
   return (
     <Box flex align="center" justify="start" pad="medium">
-      <div className="games-container container-fluid">
-        <Box
-          pad=".5em 0px"
-          margin="1em 0px"
-          align="center"
-          background="light-4"
-        >
-          <Heading level="2">Table 1</Heading>
-          <Box
-            fill
-            flex="grow"
-            direction="column"
-            align="center"
-            justify="between"
-          >
-            <Box flex fill direction="row" align="center" justify="around">
-              <Heading level="3">Player 1</Heading>
-              <Heading level="3">&</Heading>
-              <Heading level="3">Player 2</Heading>
-            </Box>
-            <Heading level="1">VS</Heading>
-            <Box flex fill direction="row" align="center" justify="around">
-              <Heading level="3">Player 3</Heading>
-              <Heading level="3">&</Heading>
-              <Heading level="3">Player 4</Heading>
-            </Box>
-          </Box>
-        </Box>
-        <Box
-          pad=".5em 0px"
-          margin="1em 0px"
-          align="center"
-          background="light-4"
-        >
-          <Heading level="2">Table 1</Heading>
-          <Box
-            fill
-            flex="grow"
-            direction="column"
-            align="center"
-            justify="between"
-          >
-            <Box flex fill direction="row" align="center" justify="around">
-              <Heading level="3">Player 1</Heading>
-              <Heading level="3">&</Heading>
-              <Heading level="3">Player 2</Heading>
-            </Box>
-            <Heading level="1">VS</Heading>
-            <Box flex fill direction="row" align="center" justify="around">
-              <Heading level="3">Player 3</Heading>
-              <Heading level="3">&</Heading>
-              <Heading level="3">Player 4</Heading>
-            </Box>
-          </Box>
-        </Box>
-        <Box flex align="center" justify="start">
-          <Button
-            primary
-            size="medium"
-            label="Add Ranked Table"
-            icon={<Add />}
-            onClick={() => console.log("start")}
+      <div className="games-container">
+        {tables.map((table, index) => (
+          <Table
+            key={index}
+            index={index}
+            roomOwner={auth.currentUser.uid === room.roomOwner.uid}
+            roomCode={user.activeRoomUid}
+            table={table}
           />
+        ))}
+        <Box style={{ minHeight: "1em" }} flex align="center" justify="start">
+          {room && user && auth.currentUser.uid === room.roomOwner.uid && (
+            <Button
+              margin="1em .0px"
+              primary
+              size="medium"
+              label="Add Table"
+              icon={<Add />}
+              onClick={() => createTable(user.activeRoomUid)}
+            />
+          )}
         </Box>
       </div>
     </Box>

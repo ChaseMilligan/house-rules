@@ -23,10 +23,8 @@ export default function Rules() {
 
   async function handleCreateNewSet(name, rules) {
     setLoading(true);
-    console.log(name, rules);
     await createRuleSet(auth.currentUser.uid, name, rules);
     const userRuleSets = await getUserRuleSets(auth.currentUser.uid);
-    console.log(userRuleSets);
     setRuleSets(userRuleSets);
     setShowAddModal(false);
     setLoading(false);
@@ -68,8 +66,6 @@ export default function Rules() {
   if (loading || user === undefined) {
     return <Loading />;
   }
-
-  console.log(canEdit);
 
   return (
     <Box flex align="center" justify="start">

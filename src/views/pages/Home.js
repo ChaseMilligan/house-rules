@@ -31,7 +31,6 @@ export default function Home() {
     setLoading(true);
     await joinRoom(auth.currentUser.uid, codeValue);
     getUserActiveRoom(auth.currentUser.uid).then((room) => {
-      console.log(room);
       setRoom(room);
       setCodeValue(null);
       setLoading(false);
@@ -49,7 +48,6 @@ export default function Home() {
   useEffect(() => {
     if (members.length === 0) {
       getUserActiveRoom(auth.currentUser.uid).then((room) => {
-        console.log(room);
         setRoom(room);
         setCodeValue(null);
         setLoading(false);
@@ -80,8 +78,6 @@ export default function Home() {
       setLoading(false);
     });
   }, []);
-
-  console.log(members, room);
 
   if (loading) {
     return <Loading />;

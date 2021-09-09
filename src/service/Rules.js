@@ -1,13 +1,11 @@
 import { db } from "../config/firebase-config";
 
 export async function createRuleSet(userUid, name, rulesArray) {
-  console.log(rulesArray);
   await db
     .collection("ruleSets")
     .doc(userUid)
     .get()
     .then(() => {
-      console.log(userUid);
       db.collection("ruleSets")
         .doc(userUid)
         .collection("sets")
@@ -29,7 +27,6 @@ export async function deleteRuleSet(userUid, ruleSet) {
 }
 
 export async function getUserRuleSets(userUid) {
-  console.log(userUid);
   let res = null;
   await db
     .collection("ruleSets")

@@ -10,6 +10,7 @@ import Loading from "./components/Loading";
 
 import "./styles/components/ProfileCard.css";
 import "./styles/components/Rules.css";
+import "./styles/components/Games.css";
 
 const theme = {
   global: {

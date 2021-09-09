@@ -24,7 +24,7 @@ export async function createRoom(userUid) {
           db.collection("rooms")
             .doc(roomCode)
             .collection("games")
-            .add({ createdAt: timeStamp, team1: [], team2: [] });
+            .add({ createdAt: timeStamp });
         });
     })
     .catch((err) => {
@@ -39,7 +39,6 @@ export async function joinRoom(userUid, houseCode) {
     .doc(houseCode)
     .get()
     .then((room) => {
-      console.log(room.data(), room.id);
       db.collection("rooms")
         .doc(room.id)
         .collection("members")
@@ -68,7 +67,6 @@ export async function leaveRoom(userUid) {
 
 export async function getUserActiveRoom(userUid) {
   let res = null;
-  console.log(userUid);
   await db
     .collection("users")
     .doc(userUid)
@@ -81,7 +79,6 @@ export async function getUserActiveRoom(userUid) {
           .get()
           .then((room) => {
             if (room.exists) {
-              console.log(userUid);
               res = { ...room.data(), uid: room.id };
             } else {
               console.log("not exists");

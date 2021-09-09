@@ -45,3 +45,7 @@ form {
   min-width: auto !important;
   min-height: auto !important;
 }
+
+.nav-margin {
+  padding-bottom: 1em;
+}

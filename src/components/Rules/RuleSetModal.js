@@ -18,14 +18,12 @@ export default function RuleSetModal(props) {
   const [value, setValue] = useState();
 
   async function handleDeleteRule(rule) {
-    console.log(rule);
     const filteredRules = rules.filter((item) => item !== rule);
     await overwriteRules(auth.currentUser.uid, props.ruleSet, filteredRules);
     setRules(filteredRules);
   }
 
   async function handleAddRule({ value }) {
-    console.log(value);
     const newRules = [...rules, value];
     await overwriteRules(auth.currentUser.uid, props.ruleSet, newRules);
     setValue("");
