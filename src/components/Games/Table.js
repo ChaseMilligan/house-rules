@@ -1,10 +1,11 @@
-import { Heading, Box, Button, Avatar, DropButton, Layer } from "grommet";
-import { deleteTable, joinTeam, leaveTeam } from "../../service/Games";
+import { Heading, Box, Button, DropButton, Paragraph } from "grommet";
+import { deleteTable, leaveTeam } from "../../service/Games";
 import { auth, db } from "../../config/firebase-config";
 import { useEffect } from "react/cjs/react.development";
 import { useState } from "react";
 import Loading from "../Loading";
-import { Add, Run, Trash, MoreVertical } from "grommet-icons";
+import { PlayFill, Run, Trash, MoreVertical } from "grommet-icons";
+import Team from "./Team";
 
 export default function Table(props) {
   const [loading, setLoading] = useState(false);
@@ -83,10 +84,9 @@ export default function Table(props) {
       flex
       direction="column"
       key={props.index}
-      pad=".5em 0px"
       align="center"
       className="game-table"
-      background="light-3"
+      background="status-disabled"
     >
       <Box
         flex="shrink"
@@ -95,6 +95,7 @@ export default function Table(props) {
         pad="0px 1.5em"
         justify="between"
         direction="row"
+        margin={{ bottom: "1em" }}
       >
         <Heading level="2">Table {props.index + 1}</Heading>
         {(currentTeam !== null || props.roomOwner) && (
@@ -135,78 +136,69 @@ export default function Table(props) {
           />
         )}
       </Box>
-      <Box
-        flex
-        fill
-        direction="column"
-        align="center"
-        margin="1.5em 0px"
-        justify="between"
-      >
-        <Box flex fill direction="row" align="center" justify="between">
-          {teamOne.map((member, index) => (
+      <Box flex fill direction="column" align="center" justify="between">
+        {currentTeam === "team2" && teamOne.length === 0 ? (
+          <Box flex fill align="center" justify="center">
+            <Paragraph>Waiting for opponent...</Paragraph>
+          </Box>
+        ) : (
+          <Box fill flex>
+            <Team
+              team={teamOne}
+              currentTeam={currentTeam}
+              table={props.table}
+              teamId="team1"
+            />
             <Box
-              flex="grow"
-              margin="0px 1em"
-              key={index}
-              direction="column"
+              flex="shrink"
+              direction="row"
               align="center"
+              justify="around"
+              className="cup-container"
             >
-              <Avatar background="brand" size="medium">
-                {member.name[0]}
-              </Avatar>
-              <p>{member.name}</p>
+              <Box className="cup" background="status-critical" />
+              <Box className="cup" background="status-critical" />
+              <Box className="cup" background="status-critical" />
+              <Box className="cup" background="status-critical" />
+              <Box className="cup" background="status-critical" />
+              <Box className="cup" background="status-critical" />
             </Box>
-          ))}
-          {!currentTeam && (
-            <Box margin="0px 1em" flex="grow" direction="column" align="center">
-              <Button
-                primary
-                margin="0px 1em"
-                disabled={currentTeam !== null}
-                icon={<Add size="small" />}
-                gap="xxsmall"
-                size="small"
-                label="Join Team"
-                onClick={() =>
-                  joinTeam(auth.currentUser.uid, props.table, "team1")
-                }
-              />
+          </Box>
+        )}
+        {/* {currentTeam ? (
+          <Button
+            label="Start Match"
+            primary
+            color="#1aa358"
+            icon={<PlayFill />}
+            disabled={teamOne.length === 0 || teamTwo.length === 0}
+          />
+        ) : (
+          <Heading level="1">VS</Heading>
+        )} */}
+
+        {currentTeam === "team1" && teamTwo.length === 0 ? (
+          <Box flex fill align="center" justify="center">
+            <Paragraph>Waiting for opponent...</Paragraph>
+          </Box>
+        ) : (
+          <Box fill flex>
+            <Box flex="shrink" direction="row" align="center" justify="around">
+              <Box className="cup" background="status-critical" />
+              <Box className="cup" background="status-critical" />
+              <Box className="cup" background="status-critical" />
+              <Box className="cup" background="status-critical" />
+              <Box className="cup" background="status-critical" />
+              <Box className="cup" background="status-critical" />
             </Box>
-          )}
-        </Box>
-        <Heading level="1">VS</Heading>
-        <Box flex fill direction="row" align="center" justify="between">
-          {teamTwo.map((member, index) => (
-            <Box
-              margin="0px 1em"
-              key={index}
-              flex="grow"
-              direction="column"
-              align="center"
-            >
-              <Avatar background="brand" size="medium">
-                {member.name[0]}
-              </Avatar>
-              <p>{member.name}</p>
-            </Box>
-          ))}
-          {!currentTeam && (
-            <Box margin="0px 1em" flex="grow" direction="column" align="center">
-              <Button
-                primary
-                disabled={currentTeam !== null}
-                icon={<Add size="small" />}
-                gap="xxsmall"
-                size="small"
-                label="Join Team"
-                onClick={() =>
-                  joinTeam(auth.currentUser.uid, props.table, "team2")
-                }
-              />
-            </Box>
-          )}
-        </Box>
+            <Team
+              team={teamTwo}
+              currentTeam={currentTeam}
+              table={props.table}
+              teamId="team2"
+            />
+          </Box>
+        )}
       </Box>
     </Box>
   );

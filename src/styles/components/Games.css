@@ -14,3 +14,12 @@
 .game-table::last-of-type {
   margin-bottom: 0px;
 }
+
+.cup {
+  padding: 0px 1px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin: 2em 0px;
+  border: solid 2px #fff;
+}
