@@ -29,8 +29,9 @@
 }
 
 .cup::after {
-  content: "\1F5D9";
+  content: "💀";
   position: absolute;
+  line-height: 1.5em;
   top: 50%;
   left: 50%;
   font-weight: 700;

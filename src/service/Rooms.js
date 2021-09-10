@@ -42,7 +42,8 @@ export async function joinRoom(userUid, houseCode) {
       db.collection("rooms")
         .doc(room.id)
         .collection("members")
-        .add({ ...user, uid: userUid });
+        .doc(userUid)
+        .set({ ...user, uid: userUid });
       db.collection("users").doc(userUid).update({
         activeRoomUid: room.id,
       });
