@@ -10,13 +10,14 @@ import { useState, useEffect } from "react";
 import Loading from "../Loading";
 import { PlayFill, Run, Trash, MoreVertical } from "grommet-icons";
 import Team from "./Team";
+import Rack from "./Rack";
 
 export default function Table(props) {
   const [loading, setLoading] = useState(false);
   const [teamOne, setTeamOne] = useState([]);
   const [teamTwo, setTeamTwo] = useState([]);
   const [currentTeam, setCurrentTeam] = useState(null);
-  const [currentMatch, setCurrentMatch] = useState();
+  const [currentMatch, setCurrentMatch] = useState(null);
 
   useEffect(() => {
     db.collection("rooms")
@@ -108,6 +109,8 @@ export default function Table(props) {
       });
   }, []);
 
+  console.log(currentMatch);
+
   if (loading) {
     <Loading />;
   }
@@ -181,32 +184,14 @@ export default function Table(props) {
               table={props.table}
               teamId="team1"
             />
-            {currentMatch && (
-              <Box flex direction="row" wrap align="center" justify="center">
-                <Box
-                  width="100%"
-                  direction="row"
-                  align="center"
-                  justify="center"
-                >
-                  <Box className="cup" background="status-critical" />
-                  <Box className="cup" background="status-critical" />
-                  <Box className="cup" background="status-critical" />
-                </Box>
-                <Box
-                  width="100%"
-                  direction="row"
-                  align="center"
-                  justify="center"
-                >
-                  <Box className="cup" background="status-critical" />
-                  <Box className="cup" background="status-critical" />
-                </Box>
-
-                <Box width="100%" align="center">
-                  <Box className="cup" background="status-critical" />
-                </Box>
-              </Box>
+            {currentMatch !== null && (
+              <Rack
+                currentMatch={currentMatch}
+                roomCode={props.roomCode}
+                teamId={"team1"}
+                table={props.table}
+                matchInProgress={props.matchInProgress}
+              />
             )}
           </Box>
         )}
@@ -240,50 +225,14 @@ export default function Table(props) {
               table={props.table}
               teamId="team2"
             />
-            {currentMatch && (
-              <Box flex direction="row" wrap align="center" justify="center">
-                <Box width="100%" align="center">
-                  <Box
-                    onClick={() =>
-                      toggleCup(
-                        props.roomCode,
-                        props.table,
-                        props.matchInProgress,
-                        1,
-                        "team2"
-                      )
-                    }
-                    background={
-                      currentMatch.score.team2.includes(1)
-                        ? "status-critical"
-                        : "dark-6"
-                    }
-                    className={
-                      currentMatch.score.team2.includes(1) ? "cup" : "cup hit"
-                    }
-                  />
-                </Box>
-                <Box
-                  width="100%"
-                  direction="row"
-                  align="center"
-                  justify="center"
-                >
-                  <Box className="cup" background="status-critical" />
-                  <Box className="cup" background="status-critical" />
-                </Box>
-
-                <Box
-                  width="100%"
-                  direction="row"
-                  align="center"
-                  justify="center"
-                >
-                  <Box className="cup" background="status-critical" />
-                  <Box className="cup" background="status-critical" />
-                  <Box className="cup" background="status-critical" />
-                </Box>
-              </Box>
+            {currentMatch !== null && (
+              <Rack
+                currentMatch={currentMatch}
+                roomCode={props.roomCode}
+                teamId={"team2"}
+                table={props.table}
+                matchInProgress={props.matchInProgress}
+              />
             )}
           </Box>
         )}
