@@ -8,14 +8,14 @@ export default function Team(props) {
     <Box
       flex
       fill
-      direction="row"
+      direction={props.matchInProgress ? "column" : "row"}
       align={props.teamId === "team1" ? "start" : "end"}
       justify="between"
     >
       {props.team.map((member, index) => (
         <Box
           flex="grow"
-          width="50%"
+          width={props.matchInProgress ? "100%" : "50%"}
           key={index}
           direction="column"
           align="center"

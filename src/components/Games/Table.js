@@ -183,6 +183,7 @@ export default function Table(props) {
               currentTeam={currentTeam}
               table={props.table}
               teamId="team1"
+              matchInProgress={props.matchInProgress}
             />
             {currentMatch !== null && (
               <Rack
@@ -224,6 +225,7 @@ export default function Table(props) {
               currentTeam={currentTeam}
               table={props.table}
               teamId="team2"
+              matchInProgress={props.matchInProgress}
             />
             {currentMatch !== null && (
               <Rack
