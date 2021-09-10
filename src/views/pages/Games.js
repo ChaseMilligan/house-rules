@@ -27,7 +27,12 @@ export default function Games() {
           .orderBy("createdAt")
           .limit(25)
           .onSnapshot(async (snapshot) => {
-            setTables(snapshot.docs.map((table) => table.id));
+            setTables(
+              snapshot.docs.map((table) => ({
+                id: table.id,
+                data: table.data(),
+              }))
+            );
             setLoading(false);
           });
       });
@@ -47,7 +52,8 @@ export default function Games() {
             index={index}
             roomOwner={auth.currentUser.uid === room.roomOwner.uid}
             roomCode={user.activeRoomUid}
-            table={table}
+            table={table.id}
+            matchInProgress={table.data.matchInProgress}
           />
         ))}
         <Box style={{ minHeight: "1em" }} flex align="center" justify="start">

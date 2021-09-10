@@ -62,7 +62,6 @@ export default function Home() {
     db.collection("rooms")
       .doc(room.uid)
       .collection("members")
-      .orderBy("name")
       .limit(25)
       .onSnapshot((snapshot) => {
         setMembers(snapshot.docs.map((doc) => doc.data()));

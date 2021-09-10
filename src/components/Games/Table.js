@@ -1,8 +1,12 @@
 import { Heading, Box, Button, DropButton, Paragraph } from "grommet";
-import { deleteTable, leaveTeam } from "../../service/Games";
+import {
+  deleteTable,
+  leaveTeam,
+  startMatch,
+  toggleCup,
+} from "../../service/Games";
 import { auth, db } from "../../config/firebase-config";
-import { useEffect } from "react/cjs/react.development";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Loading from "../Loading";
 import { PlayFill, Run, Trash, MoreVertical } from "grommet-icons";
 import Team from "./Team";
@@ -12,6 +16,7 @@ export default function Table(props) {
   const [teamOne, setTeamOne] = useState([]);
   const [teamTwo, setTeamTwo] = useState([]);
   const [currentTeam, setCurrentTeam] = useState(null);
+  const [currentMatch, setCurrentMatch] = useState();
 
   useEffect(() => {
     db.collection("rooms")
@@ -72,9 +77,36 @@ export default function Table(props) {
         setTeamTwo(snapshot.docs.map((member) => member.data()));
         setLoading(false);
       });
-  }, []);
 
-  console.log(currentTeam);
+    db.collection("rooms")
+      .doc(props.roomCode)
+      .collection("games")
+      .doc(props.table)
+      .collection("matches")
+      .limit(25)
+      .onSnapshot((snapshot) => {
+        if (!props.matchInProgress) {
+          return;
+        }
+        setLoading(true);
+        const matches = snapshot.docs.map((match) => match.data());
+        console.log(matches, props.roomCode);
+
+        db.collection("rooms")
+          .doc(props.roomCode)
+          .collection("games")
+          .doc(props.table)
+          .collection("matches")
+          .doc(props.matchInProgress.toString())
+          .get()
+          .then((doc) => {
+            if (doc.exists) {
+              setCurrentMatch(doc.data());
+            }
+          });
+        setLoading(false);
+      });
+  }, []);
 
   if (loading) {
     <Loading />;
@@ -142,61 +174,117 @@ export default function Table(props) {
             <Paragraph>Waiting for opponent...</Paragraph>
           </Box>
         ) : (
-          <Box fill flex>
+          <Box fill flex direction="row" align="center">
             <Team
               team={teamOne}
               currentTeam={currentTeam}
               table={props.table}
               teamId="team1"
             />
-            <Box
-              flex="shrink"
-              direction="row"
-              align="center"
-              justify="around"
-              className="cup-container"
-            >
-              <Box className="cup" background="status-critical" />
-              <Box className="cup" background="status-critical" />
-              <Box className="cup" background="status-critical" />
-              <Box className="cup" background="status-critical" />
-              <Box className="cup" background="status-critical" />
-              <Box className="cup" background="status-critical" />
-            </Box>
+            {currentMatch && (
+              <Box flex direction="row" wrap align="center" justify="center">
+                <Box
+                  width="100%"
+                  direction="row"
+                  align="center"
+                  justify="center"
+                >
+                  <Box className="cup" background="status-critical" />
+                  <Box className="cup" background="status-critical" />
+                  <Box className="cup" background="status-critical" />
+                </Box>
+                <Box
+                  width="100%"
+                  direction="row"
+                  align="center"
+                  justify="center"
+                >
+                  <Box className="cup" background="status-critical" />
+                  <Box className="cup" background="status-critical" />
+                </Box>
+
+                <Box width="100%" align="center">
+                  <Box className="cup" background="status-critical" />
+                </Box>
+              </Box>
+            )}
           </Box>
         )}
-        {/* {currentTeam ? (
+        {currentTeam && !props.matchInProgress && (
           <Button
             label="Start Match"
             primary
             color="#1aa358"
             icon={<PlayFill />}
+            onClick={() =>
+              startMatch(props.roomCode, props.table, {
+                team1: teamOne,
+                team2: teamTwo,
+              })
+            }
             disabled={teamOne.length === 0 || teamTwo.length === 0}
           />
-        ) : (
+        )}
+        {!currentTeam && !props.matchInProgress && (
           <Heading level="1">VS</Heading>
-        )} */}
-
+        )}
         {currentTeam === "team1" && teamTwo.length === 0 ? (
           <Box flex fill align="center" justify="center">
             <Paragraph>Waiting for opponent...</Paragraph>
           </Box>
         ) : (
-          <Box fill flex>
-            <Box flex="shrink" direction="row" align="center" justify="around">
-              <Box className="cup" background="status-critical" />
-              <Box className="cup" background="status-critical" />
-              <Box className="cup" background="status-critical" />
-              <Box className="cup" background="status-critical" />
-              <Box className="cup" background="status-critical" />
-              <Box className="cup" background="status-critical" />
-            </Box>
+          <Box fill flex direction="row" align="center">
             <Team
               team={teamTwo}
               currentTeam={currentTeam}
               table={props.table}
               teamId="team2"
             />
+            {currentMatch && (
+              <Box flex direction="row" wrap align="center" justify="center">
+                <Box width="100%" align="center">
+                  <Box
+                    onClick={() =>
+                      toggleCup(
+                        props.roomCode,
+                        props.table,
+                        props.matchInProgress,
+                        1,
+                        "team2"
+                      )
+                    }
+                    background={
+                      currentMatch.score.team2.includes(1)
+                        ? "status-critical"
+                        : "dark-6"
+                    }
+                    className={
+                      currentMatch.score.team2.includes(1) ? "cup" : "cup hit"
+                    }
+                  />
+                </Box>
+                <Box
+                  width="100%"
+                  direction="row"
+                  align="center"
+                  justify="center"
+                >
+                  <Box className="cup" background="status-critical" />
+                  <Box className="cup" background="status-critical" />
+                </Box>
+
+                <Box
+                  width="100%"
+                  direction="row"
+                  align="center"
+                  justify="center"
+                >
+                  <Box className="cup" background="status-critical" />
+                  <Box className="cup" background="status-critical" />
+                  <Box className="cup" background="status-critical" />
+                </Box>
+              </Box>
+            )}
           </Box>
         )}
       </Box>
