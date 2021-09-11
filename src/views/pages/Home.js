@@ -28,6 +28,9 @@ export default function Home() {
   }
 
   async function handleJoinRoom() {
+    if (!codeValue) {
+      return;
+    }
     setLoading(true);
     await joinRoom(auth.currentUser.uid, codeValue);
     getUserActiveRoom(auth.currentUser.uid).then((room) => {
@@ -114,7 +117,7 @@ export default function Home() {
 
   return (
     <Box margin="4em 0px" flex align="center" justify="around">
-      <Box flex="shrink" align="center" justify="center">
+      <Box flex="grow" align="center" justify="around">
         <Form onSubmit={handleJoinRoom}>
           <Box flex="shrink" align="center" justify="center">
             <TextInput
@@ -134,15 +137,15 @@ export default function Home() {
             />
           </Box>
         </Form>
+        <Heading>Or</Heading>
+        <Button
+          primary
+          size="large"
+          label="Start a Party"
+          icon={<Bar />}
+          onClick={handleCreateRoom}
+        />
       </Box>
-      <Heading>Or</Heading>
-      <Button
-        primary
-        size="large"
-        label="Start a Party"
-        icon={<Bar />}
-        onClick={handleCreateRoom}
-      />
     </Box>
   );
 }

@@ -83,7 +83,7 @@ export default function RuleSetModal(props) {
               </Box>
             ))}
 
-          <Box flex="grow" pad="1em 0em">
+          <Box flex="grow" margin=".5em 0px" pad="1em 0em">
             {props.canEdit && (
               <Button
                 margin=".5em 0px"
