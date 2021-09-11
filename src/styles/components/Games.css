@@ -1,6 +1,7 @@
 .games-container {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 .game-table {
@@ -13,6 +14,24 @@
 
 .game-table::last-of-type {
   margin-bottom: 0px;
+}
+
+.team-container {
+  margin: 0.5em;
+  max-width: 100vw !important;
+  padding: 1em;
+}
+
+.bottom-divider {
+  border-bottom: solid 1px #999;
+}
+
+.team-container:last-of-type {
+  margin-top: 0px;
+}
+
+.playing {
+  border-right: solid 1px #999;
 }
 
 .cup {
@@ -53,7 +72,24 @@
 
 @media only screen and (max-width: 374px) {
   .cup {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
   }
+}
+
+.victory-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  transition-duration: 0.5s;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.show {
+  opacity: 1;
+  visibility: visible;
 }

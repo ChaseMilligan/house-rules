@@ -6,9 +6,14 @@ export function getRoomCode() {
       Math.floor(Math.random() * randomChars.length)
     );
   }
-  return result;
+  return result.toString();
 }
 
 export function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
+}
+
+export function percentage(partialValue, totalValue) {
+  console.log(partialValue, totalValue);
+  return Math.floor((100 * partialValue) / totalValue);
 }

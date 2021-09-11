@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 export default function ProfileCard(props) {
   const [meterColor, setMeterColor] = useState("#FFAA15");
 
+  console.log(props.winLoss);
+
   useEffect(() => {
     if (props.winLoss > 52) {
       setMeterColor("#00C781");

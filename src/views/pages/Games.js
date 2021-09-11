@@ -39,6 +39,8 @@ export default function Games() {
     });
   }, []);
 
+  console.log(tables);
+
   if (loading) {
     <Loading />;
   }

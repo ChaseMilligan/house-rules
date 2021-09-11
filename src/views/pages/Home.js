@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import ProfileCard from "../../components/ProfileCard";
 import { auth, db } from "../../config/firebase-config";
-import { getRndInteger } from "../../scripts/helpers";
 import {
   createRoom,
   getUserActiveRoom,
   joinRoom,
   leaveRoom,
 } from "../../service/Rooms";
+import { percentage } from "./../../scripts/helpers";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -93,14 +93,20 @@ export default function Home() {
           onClick={handleLeaveRoom}
         />
         <div className="container-fluid">
-          {members.map((member) => (
-            <ProfileCard
-              key={member.uid}
-              name={member.name}
-              winLoss={getRndInteger(35, 65)}
-              homeOwner={member.uid === room.roomOwner.uid ? true : false}
-            />
-          ))}
+          {members &&
+            members.map((member) => (
+              <ProfileCard
+                key={member.uid}
+                name={member.name}
+                winLoss={
+                  percentage(
+                    member.totalVictories,
+                    member.totalMatchesPlayed
+                  ) || "0"
+                }
+                homeOwner={member.uid === room.roomOwner.uid ? true : false}
+              />
+            ))}
         </div>
       </Box>
     );

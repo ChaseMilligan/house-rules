@@ -2,6 +2,7 @@ import { Box } from "grommet";
 import Cup from "./Cup";
 
 export default function Rack(props) {
+  console.log(props.isUserPlaying);
   return (
     <Box
       flex
@@ -9,9 +10,12 @@ export default function Rack(props) {
       wrap
       align="center"
       justify="center"
+      classname="rack"
     >
       <Box width="100%" align="center">
         <Cup
+          currentTeam={props.currentTeam}
+          isUserPlaying={props.isUserPlaying}
           roomCode={props.roomCode}
           table={props.table}
           matchInProgress={props.matchInProgress}
@@ -22,6 +26,8 @@ export default function Rack(props) {
       </Box>
       <Box width="100%" direction="row" align="center" justify="center">
         <Cup
+          currentTeam={props.currentTeam}
+          isUserPlaying={props.isUserPlaying}
           roomCode={props.roomCode}
           table={props.table}
           matchInProgress={props.matchInProgress}
@@ -30,6 +36,8 @@ export default function Rack(props) {
           teamId={props.teamId}
         />
         <Cup
+          currentTeam={props.currentTeam}
+          isUserPlaying={props.isUserPlaying}
           roomCode={props.roomCode}
           table={props.table}
           matchInProgress={props.matchInProgress}
@@ -41,6 +49,8 @@ export default function Rack(props) {
 
       <Box width="100%" direction="row" align="center" justify="center">
         <Cup
+          currentTeam={props.currentTeam}
+          isUserPlaying={props.isUserPlaying}
           roomCode={props.roomCode}
           table={props.table}
           matchInProgress={props.matchInProgress}
@@ -49,6 +59,8 @@ export default function Rack(props) {
           teamId={props.teamId}
         />
         <Cup
+          currentTeam={props.currentTeam}
+          isUserPlaying={props.isUserPlaying}
           roomCode={props.roomCode}
           table={props.table}
           matchInProgress={props.matchInProgress}
@@ -57,6 +69,8 @@ export default function Rack(props) {
           teamId={props.teamId}
         />
         <Cup
+          currentTeam={props.currentTeam}
+          isUserPlaying={props.isUserPlaying}
           roomCode={props.roomCode}
           table={props.table}
           matchInProgress={props.matchInProgress}

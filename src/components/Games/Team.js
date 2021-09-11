@@ -11,6 +11,7 @@ export default function Team(props) {
       direction={props.matchInProgress ? "column" : "row"}
       align={props.teamId === "team1" ? "start" : "end"}
       justify="between"
+      className={props.matchInProgress ? "playing" : ""}
     >
       {props.team.map((member, index) => (
         <Box
@@ -19,14 +20,15 @@ export default function Team(props) {
           key={index}
           direction="column"
           align="center"
+          justify="center"
         >
           <Avatar background="brand" size="medium">
-            {member.name[0]}
+            {member.data.name[0]}
           </Avatar>
-          <p>{member.name}</p>
+          <p>{member.data.name}</p>
         </Box>
       ))}
-      {!props.currentTeam && (
+      {!props.currentTeam && !props.matchInProgress && (
         <Box width="50%" flex="grow" direction="column" align="center">
           <Button
             style={{ borderRadius: "50%" }}
