@@ -25,7 +25,7 @@ export default function Team(props) {
           <Avatar background="brand" size="medium">
             {member.data.name[0]}
           </Avatar>
-          <p>{member.data.name}</p>
+          <p style={{ marginTop: ".25em" }}>{member.data.name}</p>
         </Box>
       ))}
       {!props.currentTeam && !props.matchInProgress && (

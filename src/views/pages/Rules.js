@@ -42,10 +42,10 @@ export default function Rules() {
     setShowAddModal(false);
   }
 
-  useEffect(async () => {
+  useEffect(() => {
     setLoading(true);
-    const fetchedUser = await getUserByUid(auth.currentUser.uid);
-    await getUserActiveRoom(auth.currentUser.uid).then(async (activeRoom) => {
+    const fetchedUser = getUserByUid(auth.currentUser.uid);
+    getUserActiveRoom(auth.currentUser.uid).then(async (activeRoom) => {
       if (activeRoom) {
         if (auth.currentUser.uid === activeRoom.roomOwner.uid) {
           setCanEdit(true);
@@ -70,41 +70,33 @@ export default function Rules() {
   return (
     <Box flex align="center" justify="start">
       <div className="rules-container container-fluid">
-        {user && user.activeRoomUid ? (
-          <Box flex align="start" justify="center">
-            <Heading level="2">Rules of the House</Heading>
-            {ruleSets && ruleSets.length !== 0 && (
-              <RuleSetList ruleSets={ruleSets} canEdit={canEdit} />
-            )}
-          </Box>
-        ) : (
-          <Box flex align="start" justify="center">
-            {showAddModal && (
-              <AddModal
-                onModalClose={onModalClose}
-                onSubmit={handleCreateNewSet}
-              />
-            )}
-            <Box flex fill direction="row" align="center" justify="between">
-              <Heading level="2">Your Rule Sets</Heading>
-              <Button
-                primary
-                onClick={() => setShowAddModal(true)}
-                size="small"
-                gap="xxsmall"
-                label="New"
-                icon={<Add />}
-              />
-            </Box>
-            {ruleSets && ruleSets.length !== 0 && (
-              <RuleSetList
-                ruleSets={ruleSets}
-                canEdit={canEdit}
-                handleDeleteRuleSet={handleDeleteRuleSet}
-              />
-            )}
-          </Box>
+        {showAddModal && (
+          <AddModal onModalClose={onModalClose} onSubmit={handleCreateNewSet} />
         )}
+        <Box flex align="start" justify="center">
+          <Box flex fill direction="row" align="center" justify="between">
+            <Heading level="2">
+              {user && user.activeRoomUid
+                ? "Rules of the house"
+                : "Your Rules Seta"}
+            </Heading>
+            <Button
+              primary
+              onClick={() => setShowAddModal(true)}
+              size="small"
+              gap="xxsmall"
+              label="New"
+              icon={<Add />}
+            />
+          </Box>
+          {ruleSets && ruleSets.length !== 0 && (
+            <RuleSetList
+              ruleSets={ruleSets}
+              canEdit={canEdit}
+              handleDeleteRuleSet={handleDeleteRuleSet}
+            />
+          )}
+        </Box>
       </div>
     </Box>
   );
