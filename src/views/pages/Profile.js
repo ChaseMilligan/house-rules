@@ -11,12 +11,17 @@ import { Logout, CloudUpload } from "grommet-icons";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import { auth } from "../../config/firebase-config";
-import { getUserByUid } from "./../../service/Users";
+import {
+  getProfileImageUrl,
+  getUserByUid,
+  uploadProfileImage,
+} from "./../../service/Users";
 
 export default function Profile() {
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(false);
   const [fileToUpload, setFileToUpload] = useState(null);
+  const [avatarUrl, setAvatarURL] = useState();
 
   function handleSignOut() {
     setLoading(true);
@@ -32,7 +37,11 @@ export default function Profile() {
       });
   }
 
-  function handleUploadNewAvatar() {}
+  async function handleUploadNewAvatar() {
+    await uploadProfileImage(auth.currentUser.uid, fileToUpload);
+    getProfileImageUrl(auth.currentUser.uid).then((url) => setAvatarURL(url));
+    setFileToUpload();
+  }
 
   useEffect(() => {
     setLoading(true);
@@ -40,7 +49,10 @@ export default function Profile() {
       setUser(data);
       setLoading(false);
     });
+    getProfileImageUrl(auth.currentUser.uid).then((url) => setAvatarURL(url));
   }, []);
+
+  console.log(avatarUrl);
 
   if (loading) {
     <Loading />;
@@ -53,7 +65,7 @@ export default function Profile() {
           <Box flex align="center" justify="center">
             <Avatar
               margin=".5em 0px"
-              src={user.avatarUrl || null}
+              src={avatarUrl || null}
               background="brand"
               size="5xl"
             >

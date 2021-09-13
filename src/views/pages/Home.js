@@ -100,7 +100,10 @@ export default function Home() {
             members.map((member) => (
               <ProfileCard
                 key={member.uid}
+                uid={member.uid}
                 name={member.name}
+                totalVictories={member.totalVictories}
+                totalMatchesPlayed={member.totalMatchesPlayed}
                 winLoss={
                   percentage(
                     member.totalVictories,
