@@ -76,9 +76,7 @@ export default function Rules() {
         <Box flex align="start" justify="center">
           <Box flex fill direction="row" align="center" justify="between">
             <Heading level="2">
-              {user && user.activeRoomUid
-                ? "Rules of the house"
-                : "Your Rules Seta"}
+              {user && user.activeRoomUid ? "Rules of the house" : "Your Rules"}
             </Heading>
             <Button
               primary
