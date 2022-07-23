@@ -28,14 +28,17 @@ export async function deleteRuleSet(userUid, ruleSet) {
 
 export async function getUserRuleSets(userUid) {
   let res = null;
+  console.log(userUid)
   await db
     .collection("ruleSets")
     .doc(userUid)
     .collection("sets")
     .get()
     .then((querySnapshot) => {
+      console.log(querySnapshot);
       let setsArray = [];
-      querySnapshot.forEach((doc) => {
+      querySnapshot.docs.forEach((doc) => {
+        console.log(doc);
         setsArray.push({ name: doc.id, rules: doc.data() });
       });
       res = setsArray;

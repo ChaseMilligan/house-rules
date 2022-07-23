@@ -58,17 +58,15 @@ export default function Games() {
             matchInProgress={table.data.matchInProgress}
           />
         ))}
-        <Box style={{ minHeight: "1em" }} flex align="center" justify="start">
-          {room && user && auth.currentUser.uid === room.roomOwner.uid && (
-            <Button
-              margin="1em .0px"
-              primary
-              size="medium"
-              label="Add Table"
-              icon={<Add />}
-              onClick={() => createTable(user.activeRoomUid)}
-            />
-          )}
+        <Box style={ { minHeight: "1em" } } flex align="center" justify="start">
+          <Button
+            margin="1em .0px"
+            primary
+            size="medium"
+            label="Add Table"
+            icon={<Add />}
+            onClick={() => createTable(user.activeRoomUid)}
+          />
         </Box>
       </div>
     </Box>

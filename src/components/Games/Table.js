@@ -3,7 +3,7 @@ import { deleteTable, leaveTeam, startMatch } from "../../service/Games";
 import { auth, db } from "../../config/firebase-config";
 import { useState, useEffect } from "react";
 import Loading from "../Loading";
-import { PlayFill, Run, Trash, MoreVertical } from "grommet-icons";
+import { PlayFill, Run, Trash, MoreVertical, Add } from "grommet-icons";
 import Team from "./Team";
 import Rack from "./Rack";
 import Victory from "./Victory";
@@ -212,7 +212,7 @@ export default function Table(props) {
                   />
                 )}
 
-                {props.roomOwner && (
+                { !props.matchInProgress && (
                   <Button
                     margin=".5em 0px"
                     primary
@@ -223,6 +223,18 @@ export default function Table(props) {
                     icon={<Trash size="medium" />}
                   />
                 )}
+
+                { props.matchInProgress && (
+                  <Button
+                    margin=".5em 0px"
+                    primary
+                    label="Call Next"
+                    color="status-info"
+                    gap="xxsmall"
+                    onClick={ () => deleteTable(props.roomCode, props.table) }
+                    icon={ <Add size="medium" /> }
+                  />
+                ) }
               </Box>
             }
           />

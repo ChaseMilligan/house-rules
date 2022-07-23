@@ -2,7 +2,6 @@ import { Box } from "grommet";
 import Cup from "./Cup";
 
 export default function Rack(props) {
-  console.log(props.isUserPlaying);
   return (
     <Box
       flex

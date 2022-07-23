@@ -65,7 +65,7 @@ export default function AddModal(props) {
                   onChange={(event) => setValue(event.target.value)}
                 />
               </FormField>
-              <Button label="" icon={<Add />} onClick={handleAddRuleToSet} />
+              <Button label="" icon={<Add />} disabled={!value ? true : false} onClick={handleAddRuleToSet} />
             </Box>
             {rules && rules.length !== 0 && (
               <div className="rules-list">
@@ -103,6 +103,7 @@ export default function AddModal(props) {
                 flex
                 fill
                 type="submit"
+                disabled={!ruleSetName || rules.length < 1 ? true : false}
                 primary
                 label="Create Rule Set"
                 icon={<Add />}

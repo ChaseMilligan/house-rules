@@ -50,7 +50,9 @@ export default function Rules() {
         if (auth.currentUser.uid === activeRoom.roomOwner.uid) {
           setCanEdit(true);
         }
+        console.log(activeRoom.roomOwner.uid)
         const ownerRuleSets = await getUserRuleSets(activeRoom.roomOwner.uid);
+        console.log(ownerRuleSets)
         setRuleSets(ownerRuleSets);
         setRoom(activeRoom);
       } else {
@@ -76,16 +78,19 @@ export default function Rules() {
         <Box flex align="start" justify="center">
           <Box flex fill direction="row" align="center" justify="between">
             <Heading level="2">
-              {user && user.activeRoomUid ? "Rules of the house" : "Your Rules"}
+              {!canEdit ? "Rules of the house" : "Your Rules"}
             </Heading>
-            <Button
-              primary
-              onClick={() => setShowAddModal(true)}
-              size="small"
-              gap="xxsmall"
-              label="New"
-              icon={<Add />}
-            />
+            {canEdit ? (
+              <Button
+                primary
+                onClick={() => setShowAddModal(true)}
+                size="small"
+                gap="xxsmall"
+                label="New"
+                icon={<Add />}
+              />
+              ) : ''
+            }
           </Box>
           {ruleSets && ruleSets.length !== 0 && (
             <RuleSetList
