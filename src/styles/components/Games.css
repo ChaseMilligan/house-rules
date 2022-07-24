@@ -30,10 +30,6 @@
   margin-top: 0px;
 }
 
-.playing {
-  border-right: solid 1px #999;
-}
-
 .cup {
   padding: 0px 1px;
   width: 40px;
@@ -92,4 +88,14 @@
 .show {
   opacity: 1;
   visibility: visible;
+}
+
+.result-team-card {
+  width: 50%;
+  background-color: #373752;
+  aspect-ratio: 1/1;
+}
+
+.result-team-card.winner {
+  background-color: #1aa358;
 }

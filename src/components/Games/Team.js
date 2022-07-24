@@ -11,7 +11,6 @@ export default function Team(props) {
       direction={props.matchInProgress ? "column" : "row"}
       align={props.teamId === "team1" ? "start" : "end"}
       justify="between"
-      className={props.matchInProgress ? "playing" : ""}
     >
       {props.team.map((member, index) => (
         <Box

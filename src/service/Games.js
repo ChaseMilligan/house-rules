@@ -8,8 +8,6 @@ export async function joinTeam(userUid, gameUid, team) {
     return;
   }
   await db
-    .collection("rooms")
-    .doc(user.activeRoomUid)
     .collection("games")
     .doc(gameUid)
     .collection("teams")
@@ -23,8 +21,6 @@ export async function leaveTeam(userUid, gameUid, team) {
   const user = await getUserByUid(userUid);
   console.log(userUid, gameUid, team);
   await db
-    .collection("rooms")
-    .doc(user.activeRoomUid)
     .collection("games")
     .doc(gameUid)
     .collection("teams")
@@ -34,13 +30,37 @@ export async function leaveTeam(userUid, gameUid, team) {
     .delete();
 }
 
-export async function createTable(roomCode) {
+export async function createTable(roomCode, userUid, user) {
   const timeStamp = new Date().getTime();
-  await db
-    .collection("rooms")
-    .doc(roomCode)
+  const doc = await db
     .collection("games")
-    .add({ createdAt: timeStamp });
+    .doc();
+
+  doc.set({ createdAt: timeStamp });
+
+  doc.collection('teams')
+    .doc('team1')
+    .collection('members')
+    .doc(userUid)
+    .set(user);
+
+  doc.get()
+    .then(async (doc) => {
+      await db
+      .collection("rooms")
+      .doc(roomCode)
+      .collection("games")
+      .doc(doc.id)
+      .set(doc.data())
+
+      await db
+      .collection("users")
+      .doc(userUid)
+      .collection("games")
+      .doc(doc.id)
+      .set(doc.data())
+    })
+    
 }
 
 export async function deleteTable(roomCode, gameUid) {
@@ -55,7 +75,7 @@ export async function deleteTable(roomCode, gameUid) {
 export async function startMatch(roomCode, gameUid, teams) {
   const timeStamp = new Date().getTime();
 
-  db.collection("rooms")
+  db.collection("games")
     .doc(roomCode)
     .collection("games")
     .doc(gameUid)
@@ -65,20 +85,15 @@ export async function startMatch(roomCode, gameUid, teams) {
     .doc(roomCode)
     .collection("games")
     .doc(gameUid)
-    .collection("matches")
-    .doc(timeStamp.toString())
     .set({
       startedAt: timeStamp,
-      teams,
-      score: { team1: [1, 2, 3, 4, 5, 6], team2: [1, 2, 3, 4, 5, 6] },
       winnerId: "",
-    });
+    }, { merge: true });
 }
 
 export async function endMatch(
   roomCode,
   gameUid,
-  teams,
   winnerId,
   matchInProgress
 ) {
@@ -92,78 +107,12 @@ export async function endMatch(
     .doc(roomCode)
     .collection("games")
     .doc(gameUid)
-    .collection("matches")
-    .doc(matchInProgress.toString())
     .set(
       {
         winnerId: winnerId,
       },
       { merge: true }
     );
-
-  if (winnerId !== "challenged") {
-    Object.keys(teams).forEach((team) => {
-      teams[team].forEach((memberId) => {
-        console.log(memberId);
-        db.collection("users")
-          .doc(memberId)
-          .get()
-          .then((user) => {
-            console.log(user.data(), team, winnerId);
-            db.collection("users")
-              .doc(memberId)
-              .set(
-                team !== winnerId
-                  ? {
-                      totalMatchesPlayed: user.data().totalMatchesPlayed
-                        ? user.data().totalMatchesPlayed + 1
-                        : 1,
-                      totalVictories: user.data().totalVictories
-                        ? user.data().totalVictories
-                        : 0,
-                    }
-                  : {
-                      totalMatchesPlayed: user.data().totalMatchesPlayed
-                        ? user.data().totalMatchesPlayed + 1
-                        : 1,
-                      totalVictories: user.data().totalVictories
-                        ? user.data().totalVictories + 1
-                        : 1,
-                    },
-                { merge: true }
-              );
-
-            db.collection("rooms")
-              .doc(roomCode)
-              .collection("members")
-              .doc(memberId)
-              .set(
-                team !== winnerId
-                  ? {
-                      totalMatchesPlayed: user.data().totalMatchesPlayed
-                        ? user.data().totalMatchesPlayed + 1
-                        : 1,
-                      totalVictories: user.data().totalVictories
-                        ? user.data().totalVictories
-                        : 0,
-                    }
-                  : {
-                      totalMatchesPlayed: user.data().totalMatchesPlayed
-                        ? user.data().totalMatchesPlayed + 1
-                        : 1,
-                      totalVictories: user.data().totalVictories
-                        ? user.data().totalVictories + 1
-                        : 1,
-                    },
-                { merge: true }
-              );
-          })
-          .catch((err) => {
-            return err;
-          });
-      });
-    });
-  }
 }
 
 export async function toggleCup(

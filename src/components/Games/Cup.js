@@ -2,7 +2,6 @@ import { Box } from "grommet";
 import { toggleCup } from "../../service/Games";
 
 export default function Cup(props) {
-  console.log(props.isUserPlaying, props.currentTeam);
   return (
     <Box
       onClick={

@@ -1,12 +1,13 @@
 import { Heading, Box, Button, DropButton, Paragraph } from "grommet";
-import { deleteTable, leaveTeam, startMatch } from "../../service/Games";
+import { deleteTable, leaveTeam, startMatch, endMatch } from "../../service/Games";
 import { auth, db } from "../../config/firebase-config";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Loading from "../Loading";
-import { PlayFill, Run, Trash, MoreVertical, Add } from "grommet-icons";
+import { PlayFill, StopFill, Run, Trash, MoreVertical, Add } from "grommet-icons";
 import Team from "./Team";
 import Rack from "./Rack";
 import Victory from "./Victory";
+import ResultClaim from './ResultClaim';
 
 export default function Table(props) {
   const [loading, setLoading] = useState(false);
@@ -16,11 +17,11 @@ export default function Table(props) {
   const [currentMatch, setCurrentMatch] = useState(null);
   const [isUserPlaying, setIsUserPlaying] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [resultClaimState, setResultClaimState] = useState(false);
+  const timerEl = useRef();
 
   function handleGetTeamOne() {
-    db.collection("rooms")
-      .doc(props.roomCode)
-      .collection("games")
+    db.collection("games")
       .doc(props.table)
       .collection("teams")
       .doc("team1")
@@ -28,9 +29,7 @@ export default function Table(props) {
       .limit(25)
       .onSnapshot(async (snapshot) => {
         setLoading(true);
-        db.collection("rooms")
-          .doc(props.roomCode)
-          .collection("games")
+        db.collection("games")
           .doc(props.table)
           .collection("teams")
           .doc("team1")
@@ -56,9 +55,7 @@ export default function Table(props) {
   }
 
   function handleGetTeamTwo() {
-    db.collection("rooms")
-      .doc(props.roomCode)
-      .collection("games")
+    db.collection("games")
       .doc(props.table)
       .collection("teams")
       .doc("team2")
@@ -66,9 +63,7 @@ export default function Table(props) {
       .limit(25)
       .onSnapshot(async (snapshot) => {
         setLoading(true);
-        db.collection("rooms")
-          .doc(props.roomCode)
-          .collection("games")
+        db.collection("games")
           .doc(props.table)
           .collection("teams")
           .doc("team2")
@@ -95,53 +90,26 @@ export default function Table(props) {
   }
 
   useEffect(() => {
-    if (currentMatch === null) {
-      return;
-    }
-    if (currentMatch.score["team1"].length === 0) {
-      setShowResult(true);
-      return;
-    }
-    if (currentMatch.score["team2"].length === 0) {
-      setShowResult(true);
-      return;
-    }
-    setShowResult(false);
-  }, [currentMatch]);
-
-  useEffect(() => {
-    console.log("hit");
     setCurrentMatch(null);
     if (!props.matchInProgress) {
       console.log(props.matchInProgress);
       return;
     }
     setLoading(true);
-    db.collection("rooms")
-      .doc(props.roomCode)
-      .collection("games")
-      .doc(props.table)
-      .collection("matches")
-      .limit(25)
-      .onSnapshot((snapshot) => {
-        setLoading(true);
 
-        db.collection("rooms")
-          .doc(props.roomCode)
-          .collection("games")
-          .doc(props.table)
-          .collection("matches")
-          .doc(props.matchInProgress.toString())
-          .get()
-          .then((doc) => {
-            if (doc.exists) {
-              setCurrentMatch(doc.data());
-            }
-          });
-      });
     handleGetTeamOne();
     handleGetTeamTwo();
     setLoading(false);
+    const timerInterval = setInterval(() => {
+      if (!timerEl.current) {
+        return;
+      }
+      const timeStamp = new Date().getTime();
+      const difference = timeStamp - props.matchInProgress;
+      const minutes = Math.floor(difference / 60000);
+      const seconds = ((difference % 60000) / 1000).toFixed(0);
+      timerEl.current.innerHTML = minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+    }, 1000);
   }, [props.matchInProgress, props.roomCode, props.table]);
 
   useEffect(() => {
@@ -151,7 +119,7 @@ export default function Table(props) {
     setLoading(false);
   }, []);
 
-  console.log(props.matchInProgress, currentMatch);
+  console.log(resultClaimState)
 
   if (loading) {
     <Loading />;
@@ -180,6 +148,23 @@ export default function Table(props) {
         />
       )}
 
+      {resultClaimState && (
+        <ResultClaim
+          show={resultClaimState}
+          oops={() => setResultClaimState(false)}
+          roomCode={props.roomCode}
+          claimTime={timerEl.current.innerHTML}
+          gameUid={props.table}
+          matchInProgress={props.matchInProgress}
+          currentTeam={currentTeam}
+          table={props.table}
+          teams={{
+            team1: teamOne.map((member) => member),
+            team2: teamTwo.map((member) => member),
+          }}
+        />
+      )}
+
       <Box
         flex="shrink"
         fill="horizontal"
@@ -189,7 +174,8 @@ export default function Table(props) {
         direction="row"
         margin={{ bottom: "1em" }}
       >
-        <Heading level="2">Table {props.index + 1}</Heading>
+        <Heading level="2">Game {props.index + 1}</Heading>
+        <Heading ref={timerEl}></Heading>
         {(currentTeam !== null || props.roomOwner) && (
           <DropButton
             size="small"
@@ -251,11 +237,7 @@ export default function Table(props) {
             flex
             direction="row"
             align="center"
-            className={
-              props.matchInProgress
-                ? "team-container bottom-divider"
-                : "team-container"
-            }
+            className="team-container"
           >
             <Team
               team={teamOne}
@@ -264,7 +246,7 @@ export default function Table(props) {
               teamId="team1"
               matchInProgress={props.matchInProgress}
             />
-            {currentMatch !== null && props.matchInProgress && (
+            {/* {currentMatch !== null && props.matchInProgress && (
               <Rack
                 currentTeam={currentTeam}
                 isUserPlaying={isUserPlaying}
@@ -274,7 +256,7 @@ export default function Table(props) {
                 table={props.table}
                 matchInProgress={props.matchInProgress}
               />
-            )}
+            )} */}
           </Box>
         )}
         {currentTeam && !props.matchInProgress && (
@@ -290,6 +272,16 @@ export default function Table(props) {
               })
             }
             disabled={teamOne.length === 0 || teamTwo.length === 0}
+          />
+        )}
+        {currentTeam && props.matchInProgress && (
+          <Button
+            label="End Match"
+            primary
+            color="#FF4040"
+            icon={<StopFill />}
+            onClick={() => setResultClaimState(true)}
+            disabled={!currentTeam && !props.matchInProgress}
           />
         )}
         {!currentTeam && !props.matchInProgress && (
@@ -314,7 +306,7 @@ export default function Table(props) {
               teamId="team2"
               matchInProgress={props.matchInProgress}
             />
-            {currentMatch !== null && props.matchInProgress && (
+            {/* {currentMatch !== null && props.matchInProgress && (
               <Rack
                 currentTeam={currentTeam}
                 isUserPlaying={isUserPlaying}
@@ -324,7 +316,7 @@ export default function Table(props) {
                 table={props.table}
                 matchInProgress={props.matchInProgress}
               />
-            )}
+            )} */}
           </Box>
         )}
       </Box>

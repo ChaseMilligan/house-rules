@@ -25,7 +25,6 @@ export default function Games() {
           .doc(data.activeRoomUid)
           .collection("games")
           .orderBy("createdAt")
-          .limit(25)
           .onSnapshot(async (snapshot) => {
             setTables(
               snapshot.docs.map((table) => ({
@@ -38,8 +37,6 @@ export default function Games() {
       });
     });
   }, []);
-
-  console.log(tables);
 
   if (loading) {
     <Loading />;
@@ -63,9 +60,9 @@ export default function Games() {
             margin="1em .0px"
             primary
             size="medium"
-            label="Add Table"
+            label="Create Game"
             icon={<Add />}
-            onClick={() => createTable(user.activeRoomUid)}
+            onClick={() => createTable(user.activeRoomUid, auth.currentUser.uid, user)}
           />
         </Box>
       </div>
