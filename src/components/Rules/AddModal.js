@@ -32,8 +32,6 @@ export default function AddModal(props) {
 		props.onSubmit(ruleSetName, rules);
 	}
 
-	console.log(currentRule);
-
 	return (
 		<Layer onEsc={props.onModalClose} onClickOutside={props.onModalClose}>
 			<Box overflow="scroll" padding="0px 1em">
