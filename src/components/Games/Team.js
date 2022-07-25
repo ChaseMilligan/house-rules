@@ -1,52 +1,55 @@
-import { Box, Button, Avatar } from "grommet";
-import { Add } from "grommet-icons";
-import { auth } from "../../config/firebase-config";
-import { joinTeam } from "../../service/Games";
+import { Box, Button, Avatar } from 'grommet';
+import { Add } from 'grommet-icons';
+import { auth } from '../../config/firebase-config';
+import { joinTeam } from '../../service/Games';
+import { useEffect, useState } from 'react';
+import TeamMember from './TeamMember';
+import Loading from '../Loading';
 
 export default function Team(props) {
-  return (
-    <Box
-      flex
-      fill
-      direction={props.matchInProgress ? "column" : "row"}
-      align={props.teamId === "team1" ? "start" : "end"}
-      justify="between"
-    >
+	const [loading, setLoading] = useState(false);
 
-      {props.team.map((member, index) => (
-        <Box
-          flex="grow"
-          width={props.matchInProgress ? "100%" : "50%"}
-          key={index}
-          direction="column"
-          align="center"
-          justify="center"
-        >
-          { props.winnerId === props.teamId && (
-            <p>Winner!</p>
-          ) }
-          <Avatar background="brand" size="medium">
-            {member.data.name[0]}
-          </Avatar>
-          <p style={{ marginTop: ".25em" }}>{member.data.name}</p>
-        </Box>
-      ))}
-      {!props.currentTeam && !props.matchInProgress && (
-        <Box width="50%" flex="grow" direction="column" align="center">
-          <Button
-            style={{ borderRadius: "50%" }}
-            primary
-            margin="0px 1em"
-            disabled={props.currentTeam !== null}
-            icon={<Add />}
-            gap="xxsmall"
-            onClick={() =>
-              joinTeam(auth.currentUser.uid, props.table, props.teamId)
-            }
-          />
-          <p>Join Team</p>
-        </Box>
-      )}
-    </Box>
-  );
+	console.log(loading);
+
+	if (loading) {
+		return <Loading />;
+	}
+
+	return (
+		<Box
+			flex
+			fill
+			direction={props.matchInProgress ? 'column' : 'row'}
+			align={props.teamId === 'team1' ? 'start' : 'end'}
+			justify="between"
+		>
+			{props.team.map((member, index) => (
+				<TeamMember
+					member={member}
+					index={index}
+					matchInProgress={props.matchInProgress}
+					winnerId={props.winnerId}
+					teamId={props.teamId}
+					loading={loading}
+					setLoading={setLoading}
+				/>
+			))}
+			{!props.currentTeam && !props.matchInProgress && (
+				<Box width="50%" flex="grow" direction="column" align="center">
+					<Button
+						style={{ borderRadius: '50%' }}
+						primary
+						margin="0px 1em"
+						disabled={props.currentTeam !== null}
+						icon={<Add />}
+						gap="xxsmall"
+						onClick={() =>
+							joinTeam(auth.currentUser.uid, props.table, props.teamId)
+						}
+					/>
+					<p>Join Team</p>
+				</Box>
+			)}
+		</Box>
+	);
 }
