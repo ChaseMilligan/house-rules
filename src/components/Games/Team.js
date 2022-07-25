@@ -12,6 +12,7 @@ export default function Team(props) {
       align={props.teamId === "team1" ? "start" : "end"}
       justify="between"
     >
+
       {props.team.map((member, index) => (
         <Box
           flex="grow"
@@ -21,6 +22,9 @@ export default function Team(props) {
           align="center"
           justify="center"
         >
+          { props.winnerId === props.teamId && (
+            <p>Winner!</p>
+          ) }
           <Avatar background="brand" size="medium">
             {member.data.name[0]}
           </Avatar>

@@ -20,12 +20,6 @@ export async function createRoom(userUid) {
         .collection("members")
         .doc(userUid)
         .set({ ...user, uid: userUid })
-        .then(() => {
-          db.collection("rooms")
-            .doc(roomCode)
-            .collection("games")
-            .add({ createdAt: timeStamp });
-        });
     })
     .catch((err) => {
       return err;

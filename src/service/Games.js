@@ -7,18 +7,39 @@ export async function joinTeam(userUid, gameUid, team) {
   if (!userUid || !gameUid || !team || !user) {
     return;
   }
-  await db
+
+  const gameDoc = db
     .collection("games")
     .doc(gameUid)
+
+  await gameDoc
     .collection("teams")
     .doc(team)
     .collection("members")
     .doc(userUid)
     .set(user);
+
+  await gameDoc.get()
+    .then(async (doc) =>
+    {
+      await db
+        .collection("users")
+        .doc(userUid)
+        .collection("games")
+        .doc(gameUid)
+        .set(doc.data())
+
+      await db
+        .collection("users")
+        .doc(userUid)
+        .collection("games")
+        .doc(doc.id)
+        .set({ teamId: team }, { merge: true })
+    })
 }
 
-export async function leaveTeam(userUid, gameUid, team) {
-  const user = await getUserByUid(userUid);
+export async function leaveTeam(userUid, gameUid, team)
+{
   console.log(userUid, gameUid, team);
   await db
     .collection("games")
@@ -28,6 +49,31 @@ export async function leaveTeam(userUid, gameUid, team) {
     .collection("members")
     .doc(userUid)
     .delete();
+
+  await db
+    .collection("users")
+    .doc(userUid)
+    .collection("games")
+    .doc(gameUid)
+    .delete()
+}
+
+export async function getGameByUid(uid)
+{
+  let res = null;
+  await db
+    .collection("games")
+    .doc(uid)
+    .get()
+    .then((doc) =>
+    {
+      res = doc.data();
+    })
+    .catch((err) =>
+    {
+      res = err;
+    });
+  return res;
 }
 
 export async function createTable(roomCode, userUid, user) {
@@ -54,65 +100,185 @@ export async function createTable(roomCode, userUid, user) {
       .set(doc.data())
 
       await db
-      .collection("users")
-      .doc(userUid)
-      .collection("games")
-      .doc(doc.id)
-      .set(doc.data())
+        .collection("users")
+        .doc(userUid)
+        .collection("games")
+        .doc(doc.id)
+        .set(doc.data())
+
+      await db
+        .collection("users")
+        .doc(userUid)
+        .collection("games")
+        .doc(doc.id)
+        .set({ teamId: 'team1' }, { merge: true })
     })
     
 }
 
 export async function deleteTable(roomCode, gameUid) {
+  const doc = await db
+    .collection("games")
+    .doc(gameUid);
+
   await db
     .collection("rooms")
     .doc(roomCode)
     .collection("games")
     .doc(gameUid)
     .delete();
+
+  await doc.collection('teams')
+    .doc('team1')
+    .collection('members')
+    .get()
+    .then((snapshot) =>
+    {
+      snapshot.docs.map(async (doc) =>
+      {
+        console.log(doc.id)
+        await db
+          .collection("users")
+          .doc(doc.id)
+          .collection("games")
+          .doc(gameUid)
+          .delete()
+      })
+    })
+
+  await doc.collection('teams')
+    .doc('team2')
+    .collection('members')
+    .get()
+    .then((snapshot) =>
+    {
+      snapshot.docs.map(async (doc) =>
+      {
+        console.log(doc.id)
+        await db
+          .collection("users")
+          .doc(doc.id)
+          .collection("games")
+          .doc(gameUid)
+          .delete()
+      })
+    })
+
+  await doc.delete();
 }
 
-export async function startMatch(roomCode, gameUid, teams) {
+export async function startMatch(roomCode, gameUid)
+{
+  console.log(gameUid)
   const timeStamp = new Date().getTime();
-
-  db.collection("games")
-    .doc(roomCode)
+  const doc = await db
     .collection("games")
-    .doc(gameUid)
-    .set({ matchInProgress: timeStamp }, { merge: true });
+    .doc(gameUid);
 
-  db.collection("rooms")
-    .doc(roomCode)
-    .collection("games")
-    .doc(gameUid)
-    .set({
-      startedAt: timeStamp,
-      winnerId: "",
-    }, { merge: true });
+  await doc
+    .set({ matchInProgress: timeStamp }, { merge: true })
+    .then(async () =>
+    {
+      await db
+        .collection("rooms")
+        .doc(roomCode)
+        .collection("games")
+        .doc(gameUid)
+        .set({ matchInProgress: timeStamp }, { merge: true })
+    });
+
+  await doc.collection('teams')
+    .doc('team1')
+    .collection('members')
+    .get()
+    .then((snapshot) =>
+    {
+      snapshot.docs.map(async (doc) =>
+      {
+        console.log(doc.id)
+        await db
+          .collection("users")
+          .doc(doc.id)
+          .collection("games")
+          .doc(gameUid)
+          .set({ matchInProgress: timeStamp }, { merge: true })
+      })
+    })
+
+  await doc.collection('teams')
+    .doc('team2')
+    .collection('members')
+    .get()
+    .then((snapshot) =>
+    {
+      snapshot.docs.map(async (doc) =>
+      {
+        console.log(doc.id)
+        await db
+          .collection("users")
+          .doc(doc.id)
+          .collection("games")
+          .doc(gameUid)
+          .set({ matchInProgress: timeStamp }, { merge: true })
+      })
+    })
 }
 
 export async function endMatch(
   roomCode,
   gameUid,
   winnerId,
-  matchInProgress
 ) {
-  db.collection("rooms")
-    .doc(roomCode)
+  const timeStamp = new Date().getTime();
+  const doc = await db
     .collection("games")
-    .doc(gameUid)
-    .set({ matchInProgress: "" }, { merge: true });
+    .doc(gameUid);
+
+  await doc.set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
 
   db.collection("rooms")
     .doc(roomCode)
     .collection("games")
     .doc(gameUid)
-    .set(
+    .set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
+
+  await doc.collection('teams')
+    .doc('team1')
+    .collection('members')
+    .get()
+    .then((snapshot) =>
+    {
+      snapshot.docs.map(async (doc) =>
       {
-        winnerId: winnerId,
-      },
-      { merge: true }
-    );
+        console.log(doc.id)
+        await db
+          .collection("users")
+          .doc(doc.id)
+          .collection("games")
+          .doc(gameUid)
+          .set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
+      })
+    })
+
+  await doc.collection('teams')
+    .doc('team2')
+    .collection('members')
+    .get()
+    .then((snapshot) =>
+    {
+      snapshot.docs.map(async (doc) =>
+      {
+        console.log(doc.id)
+        await db
+          .collection("users")
+          .doc(doc.id)
+          .collection("games")
+          .doc(gameUid)
+          .set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
+      })
+    })
+
+
 }
 
 export async function toggleCup(

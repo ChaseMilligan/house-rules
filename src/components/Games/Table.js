@@ -5,16 +5,13 @@ import { useState, useEffect, useRef } from "react";
 import Loading from "../Loading";
 import { PlayFill, StopFill, Run, Trash, MoreVertical, Add } from "grommet-icons";
 import Team from "./Team";
-import Rack from "./Rack";
-import Victory from "./Victory";
 import ResultClaim from './ResultClaim';
 
 export default function Table(props) {
   const [loading, setLoading] = useState(false);
   const [teamOne, setTeamOne] = useState([]);
   const [teamTwo, setTeamTwo] = useState([]);
-  const [currentTeam, setCurrentTeam] = useState(null);
-  const [currentMatch, setCurrentMatch] = useState(null);
+  const [ currentTeam, setCurrentTeam ] = useState(null);
   const [isUserPlaying, setIsUserPlaying] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [resultClaimState, setResultClaimState] = useState(false);
@@ -39,7 +36,8 @@ export default function Table(props) {
           .then((doc) => {
             if (doc.exists) {
               setCurrentTeam("team1");
-              if (props.matchInProgress) {
+              if (props.matchInProgress && !props.endedAt)
+              {
                 setIsUserPlaying(props.matchInProgress.toString());
               }
             }
@@ -51,6 +49,7 @@ export default function Table(props) {
             id: member.id,
           }))
         );
+        setLoading(false);
       });
   }
 
@@ -73,7 +72,8 @@ export default function Table(props) {
           .then((doc) => {
             if (doc.exists) {
               setCurrentTeam("team2");
-              if (props.matchInProgress) {
+              if (props.matchInProgress && !props.endedAt)
+              {
                 console.log(props.matchInProgress);
                 setIsUserPlaying(props.matchInProgress.toString());
               }
@@ -86,11 +86,28 @@ export default function Table(props) {
             id: member.id,
           }))
         );
+        setLoading(false);
       });
   }
 
-  useEffect(() => {
-    setCurrentMatch(null);
+  var timerInterval;
+
+  function timer()
+  {
+    if (!timerEl.current)
+    {
+      return;
+    }
+    console.log(props.endedAt)
+    const timeStamp = props.endedAt || new Date().getTime();
+    const difference = timeStamp - props.matchInProgress;
+    const minutes = Math.floor(difference / 60000);
+    const seconds = ((difference % 60000) / 1000).toFixed(0);
+    timerEl.current.innerHTML = minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+  }
+
+  useEffect(() =>
+  {
     if (!props.matchInProgress) {
       console.log(props.matchInProgress);
       return;
@@ -99,27 +116,35 @@ export default function Table(props) {
 
     handleGetTeamOne();
     handleGetTeamTwo();
-    setLoading(false);
-    const timerInterval = setInterval(() => {
-      if (!timerEl.current) {
-        return;
-      }
-      const timeStamp = new Date().getTime();
-      const difference = timeStamp - props.matchInProgress;
-      const minutes = Math.floor(difference / 60000);
-      const seconds = ((difference % 60000) / 1000).toFixed(0);
-      timerEl.current.innerHTML = minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
-    }, 1000);
-  }, [props.matchInProgress, props.roomCode, props.table]);
+
+  }, [ props.matchInProgress, props.roomCode, props.table, props.endedAt ]);
 
   useEffect(() => {
     setLoading(true);
     handleGetTeamOne();
     handleGetTeamTwo();
-    setLoading(false);
   }, []);
 
-  console.log(resultClaimState)
+  if (timerEl.current)
+  {
+    if (props.matchInProgress && !props.endedAt)
+    {
+      console.log('hihihihihihi')
+      timerInterval = setInterval(timer, 1000);
+    }
+
+
+    if (props.endedAt)
+    {
+      console.log('here')
+      clearInterval(timerInterval)
+      timerInterval = null;
+      const difference = props.endedAt - props.matchInProgress;
+      const minutes = Math.floor(difference / 60000);
+      const seconds = ((difference % 60000) / 1000).toFixed(0);
+      timerEl.current.innerHTML = minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+    }
+  }
 
   if (loading) {
     <Loading />;
@@ -130,23 +155,9 @@ export default function Table(props) {
       direction="column"
       key={props.index}
       align="center"
-      className="game-table"
+      className={ props.endedAt ? "game-table ended" : 'game-table' }
       background="status-disabled"
     >
-      {props.matchInProgress && currentMatch && currentTeam && (
-        <Victory
-          show={showResult}
-          roomCode={props.roomCode}
-          gameUid={props.table}
-          matchInProgress={props.matchInProgress}
-          currentScore={currentMatch.score}
-          currentTeam={currentTeam}
-          teams={{
-            team1: teamOne.map((member) => member.id),
-            team2: teamTwo.map((member) => member.id),
-          }}
-        />
-      )}
 
       {resultClaimState && (
         <ResultClaim
@@ -176,7 +187,7 @@ export default function Table(props) {
       >
         <Heading level="2">Game {props.index + 1}</Heading>
         <Heading ref={timerEl}></Heading>
-        {(currentTeam !== null || props.roomOwner) && (
+        { (currentTeam !== null) && (
           <DropButton
             size="small"
             icon={<MoreVertical color="brand" size="medium" />}
@@ -184,6 +195,7 @@ export default function Table(props) {
             dropContent={
               <Box pad=".5em" background="light-2" fill>
                 {currentTeam !== null && (
+                  <>
                   <Button
                     primary
                     margin=".5em 0px"
@@ -195,10 +207,7 @@ export default function Table(props) {
                       leaveTeam(auth.currentUser.uid, props.table, currentTeam);
                     }}
                     icon={<Run size="medium" />}
-                  />
-                )}
-
-                { !props.matchInProgress && (
+                    />
                   <Button
                     margin=".5em 0px"
                     primary
@@ -208,7 +217,8 @@ export default function Table(props) {
                     onClick={() => deleteTable(props.roomCode, props.table)}
                     icon={<Trash size="medium" />}
                   />
-                )}
+                  </>
+                ) }
 
                 { props.matchInProgress && (
                   <Button
@@ -226,7 +236,7 @@ export default function Table(props) {
           />
         )}
       </Box>
-      <Box flex fill direction="column" align="center" justify="between">
+      <Box flex fill direction={ props.endedAt ? "row" : "column" } align="center" justify="between">
         {currentTeam === "team2" && teamOne.length === 0 ? (
           <Box flex fill align="center" justify="center">
             <Paragraph>Waiting for opponent...</Paragraph>
@@ -237,13 +247,14 @@ export default function Table(props) {
             flex
             direction="row"
             align="center"
-            className="team-container"
+              className={ props.winnerId === "team1" ? "team-container winner" : "team-container" }
           >
             <Team
               team={teamOne}
               currentTeam={currentTeam}
               table={props.table}
               teamId="team1"
+                winnerId={ props.winnerId }
               matchInProgress={props.matchInProgress}
             />
             {/* {currentMatch !== null && props.matchInProgress && (
@@ -259,22 +270,19 @@ export default function Table(props) {
             )} */}
           </Box>
         )}
-        {currentTeam && !props.matchInProgress && (
+        { currentTeam && !props.matchInProgress && !props.endedAt && (
           <Button
             label="Start Match"
             primary
             color="#1aa358"
             icon={<PlayFill />}
             onClick={() =>
-              startMatch(props.roomCode, props.table, {
-                team1: teamOne,
-                team2: teamTwo,
-              })
+              startMatch(props.roomCode, props.table)
             }
             disabled={teamOne.length === 0 || teamTwo.length === 0}
           />
         )}
-        {currentTeam && props.matchInProgress && (
+        { currentTeam && props.matchInProgress && !props.endedAt && (
           <Button
             label="End Match"
             primary
@@ -297,13 +305,14 @@ export default function Table(props) {
             flex
             direction="row"
             align="center"
-            className="team-container"
+              className={ props.winnerId === "team2" ? "team-container winner" : "team-container" }
           >
             <Team
               team={teamTwo}
               currentTeam={currentTeam}
               table={props.table}
               teamId="team2"
+                winnerId={ props.winnerId }
               matchInProgress={props.matchInProgress}
             />
             {/* {currentMatch !== null && props.matchInProgress && (

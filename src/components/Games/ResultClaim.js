@@ -9,6 +9,12 @@ export default function ResultClaim(props) {
 
   console.log(props.matchInProgress)
 
+  function handleSubmit()
+  {
+    endMatch(props.roomCode, props.table, claimWinner)
+    props.oops()
+  }
+
   return (
     <Box
       className={props.show ? "victory-screen show" : "victory-screen"}
@@ -41,8 +47,8 @@ export default function ResultClaim(props) {
             fill
             justify="center"
             direction="column"
-            className={claimWinner === "1" ? 'winner result-team-card' : 'result-team-card'}
-            onClick={() => setClaimWinner('1')}
+            className={ claimWinner === "team1" ? 'winner result-team-card' : 'result-team-card' }
+            onClick={ () => setClaimWinner('team1') }
           >
             <Team
               team={props.teams.team1}
@@ -58,8 +64,8 @@ export default function ResultClaim(props) {
             fill
             justify="center"
             direction="column"
-            className={claimWinner === "2" ? 'winner result-team-card' : 'result-team-card'}
-            onClick={() => setClaimWinner('2')}
+            className={ claimWinner === "team2" ? 'winner result-team-card' : 'result-team-card' }
+            onClick={ () => setClaimWinner('team2') }
           >
             <Team
               team={props.teams.team2}
@@ -76,6 +82,7 @@ export default function ResultClaim(props) {
           label="Submit"
           margin=".5em"
           disabled={!claimWinner}
+          onClick={ handleSubmit }
         />
         <Button
           primary

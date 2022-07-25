@@ -4,7 +4,7 @@ import { auth, db } from "../../config/firebase-config";
 import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import { getUserByUid } from "../../service/Users";
-import { createTable } from "../../service/Games";
+import { createTable, getGameByUid } from "../../service/Games";
 import { getUserActiveRoom } from "../../service/Rooms";
 import Table from "./../../components/Games/Table";
 
@@ -26,21 +26,40 @@ export default function Games() {
           .collection("games")
           .orderBy("createdAt")
           .onSnapshot(async (snapshot) => {
-            setTables(
-              snapshot.docs.map((table) => ({
-                id: table.id,
-                data: table.data(),
-              }))
-            );
-            setLoading(false);
-          });
+            const gameCount = snapshot.docs.length;
+            if (gameCount === 0)
+            {
+              setLoading(false);
+              return
+            }
+            let newTables = []
+            snapshot.docs.forEach((table) =>
+            {
+              console.log(table.id)
+              db.collection('games')
+                .doc(table.id)
+                .onSnapshot((snapshot) =>
+                {
+                  console.log(snapshot.data())
+                  newTables.push({ id: snapshot.id, data: snapshot.data() })
+                  console.log(newTables)
+                  if (newTables.length === gameCount)
+                  {
+                    setTables(newTables)
+                    setLoading(false)
+                  }
+                })
+            })
+          })
       });
     });
   }, []);
 
   if (loading) {
-    <Loading />;
+    return (<Loading />);
   }
+
+  console.log(tables)
 
   return (
     <Box flex align="center" justify="start" pad="medium">
@@ -51,8 +70,10 @@ export default function Games() {
             index={index}
             roomOwner={auth.currentUser.uid === room.roomOwner.uid}
             roomCode={user.activeRoomUid}
-            table={table.id}
-            matchInProgress={table.data.matchInProgress}
+            table={ table.id }
+            matchInProgress={ table.data.matchInProgress }
+            endedAt={ table.data.endedAt }
+            winnerId={ table.data.winnerId }
           />
         ))}
         <Box style={ { minHeight: "1em" } } flex align="center" justify="start">
