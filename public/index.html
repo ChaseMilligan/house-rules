@@ -43,7 +43,6 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 
     <script>
-      console.log('here')
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
           navigator.serviceWorker.register('%PUBLIC_URL%/service-worker.js').then(function(registration) {

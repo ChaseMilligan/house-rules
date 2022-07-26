@@ -32,6 +32,10 @@ export async function getProfileImageUrl(userUid) {
 		.getDownloadURL()
 		.then((url) => {
 			res = url;
+		})
+		.catch((err) =>
+		{
+			res = err;
 		});
 	return res;
 }

@@ -1,15 +1,13 @@
-import { Box, Button, Avatar } from 'grommet';
+import { Box, Button } from 'grommet';
 import { Add } from 'grommet-icons';
 import { auth } from '../../config/firebase-config';
 import { joinTeam } from '../../service/Games';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import TeamMember from './TeamMember';
 import Loading from '../Loading';
 
 export default function Team(props) {
 	const [loading, setLoading] = useState(false);
-
-	console.log(loading);
 
 	if (loading) {
 		return <Loading />;
