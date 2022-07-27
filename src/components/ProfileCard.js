@@ -51,6 +51,8 @@ export default function ProfileCard(props) {
 			});
 	}, [props.uid]);
 
+	console.log(avatarUrl);
+
 	return (
 		<div className="profile-card-container">
 			<Box flex direction="column" align="center" justify="around">
