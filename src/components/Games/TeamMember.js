@@ -11,7 +11,6 @@ export default function TeamMember(props) {
 		setLoading(true);
 		getProfileImageUrl(props.member.id).then((url) => {
 			setAvatarURL(url);
-			console.log('here', props.member.id);
 			setLoading(false);
 		})
 			.catch((err) =>

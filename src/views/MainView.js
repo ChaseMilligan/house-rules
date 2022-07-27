@@ -56,8 +56,6 @@ export default function MainView()
     });
   }, []);
 
-  console.log(userRoomUid)
-
   if (loading)
   {
     return <Loading />;
