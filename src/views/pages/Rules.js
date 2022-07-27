@@ -15,8 +15,7 @@ import RuleSetList from '../../components/Rules/RuleSetList';
 
 export default function Rules() {
 	const [loading, setLoading] = useState(false);
-	const [user, setUser] = useState();
-	const [room, setRoom] = useState();
+	const [ user, setUser ] = useState();
 	const [ruleSets, setRuleSets] = useState([]);
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [canEdit, setCanEdit] = useState(false);
@@ -52,7 +51,6 @@ export default function Rules() {
 				}
 				const ownerRuleSets = await getUserRuleSets(activeRoom.roomOwner.uid);
 				setRuleSets(ownerRuleSets);
-				setRoom(activeRoom);
 			} else {
 				setCanEdit(true);
 				const userRuleSets = await getUserRuleSets(auth.currentUser.uid);

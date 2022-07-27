@@ -6,6 +6,7 @@ import { googleProvider } from "../config/authMethods";
 import socialMediaAuth, { emailPassAuth } from "../service/auth";
 import { Switch, Route, Link } from "react-router-dom";
 import CreateUser from "./CreateUser";
+import Loading from "../components/Loading";
 
 export default function SignIn() {
   const [value, setValue] = useState("");
@@ -13,7 +14,7 @@ export default function SignIn() {
 
   const handleAuthClick = async (provider) => {
     setLoading(true);
-    const res = await socialMediaAuth(provider);
+    await socialMediaAuth(provider);
     setLoading(false);
   };
 
@@ -22,6 +23,11 @@ export default function SignIn() {
     const { email, password } = value;
     emailPassAuth(email, password);
     setLoading(false);
+  }
+
+  if (loading)
+  {
+    return <Loading />
   }
 
   return (
@@ -51,7 +57,7 @@ export default function SignIn() {
             gap="medium"
           >
             <Button type="submit" primary label="Sign In" />
-            <a href="#">Forgot Password?</a>
+            <a href="/forgot-password">Forgot Password?</a>
           </Box>
         </Form>
         <Box flex="shrink" pad="1em 0px" direction="column">

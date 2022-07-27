@@ -4,6 +4,7 @@ import { UserNew, Login } from "grommet-icons";
 import logo from "../images/HR_icon.png";
 import { Link } from "react-router-dom";
 import { createEmailPassAuth } from "../service/auth";
+import Loading from "../components/Loading";
 
 export default function CreateUser() {
   const [value, setValue] = useState("");
@@ -15,6 +16,12 @@ export default function CreateUser() {
     createEmailPassAuth(email, name, password);
     setLoading(false);
   }
+
+  if (loading)
+  {
+    return <Loading />
+  }
+
   return (
     <Box flex align="center" justify="center">
       <Box height="small" width="small">

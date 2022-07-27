@@ -2,10 +2,8 @@ import {
 	Avatar,
 	Box,
 	Button,
-	FormField,
 	Heading,
-	FileInput,
-	TextArea
+	FileInput
 } from 'grommet';
 import { Logout, CloudUpload } from 'grommet-icons';
 import { useEffect, useState } from 'react';

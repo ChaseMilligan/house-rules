@@ -1,5 +1,4 @@
 import { auth, db } from "../config/firebase-config";
-import { getUserByUid } from "./Users";
 
 const socialMediaAuth = (provider) => {
   auth

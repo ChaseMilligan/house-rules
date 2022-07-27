@@ -4,7 +4,7 @@ import { auth, db } from '../../config/firebase-config';
 import { useEffect, useState } from 'react';
 import Loading from '../../components/Loading';
 import { getUserByUid } from '../../service/Users';
-import { createTable, getGameByUid } from '../../service/Games';
+import { createTable } from '../../service/Games';
 import { getUserActiveRoom } from '../../service/Rooms';
 import Table from './../../components/Games/Table';
 

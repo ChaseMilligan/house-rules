@@ -1,5 +1,5 @@
-import { Box, Button, Heading } from 'grommet';
-import { endMatch, toggleCup } from '../../service/Games';
+import { Box, Button } from 'grommet';
+import { endMatch } from '../../service/Games';
 import { useState } from 'react';
 import Team from './Team';
 

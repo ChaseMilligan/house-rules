@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Button, Collapsible, Layer, Heading, Nav, Anchor } from 'grommet';
+import { Box, Button, Collapsible, Layer, Nav, Anchor } from 'grommet';
 import {
 	FormClose,
 	Logout,
-	Menu,
 	Notes,
 	Trophy,
 	Home as House,
@@ -18,14 +17,14 @@ import Rules from './pages/Rules';
 import Games from './pages/Games';
 import { getUserByUid } from '../service/Users';
 import Loading from '../components/Loading';
-
 export default function MainView() {
 	const [showSidebar, setShowSidebar] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [userRoomUid, setUserRoomUid] = useState();
 
 	function handleSignOut() {
 		setLoading(true);
-		const signOut = auth
+		auth
 			.signOut()
 			.then((res) => {
 				setLoading(false);
@@ -39,9 +38,15 @@ export default function MainView() {
 
 	useEffect(() => {
 		setLoading(true);
-		getUserByUid(auth.currentUser.uid).then((user) => {
-			console.log(user);
-		});
+		getUserByUid(auth.currentUser.uid)
+			.then((user) => {
+				setUserRoomUid(user);
+				setLoading(false);
+			})
+			.catch((err) => {
+				console.log(err);
+				setLoading(false);
+			});
 	}, []);
 
 	if (loading) {
@@ -51,13 +56,32 @@ export default function MainView() {
 	return (
 		<>
 			<Nav direction="row" background="brand" pad="medium" justify="around">
-				<Anchor href="/rules" icon={<Notes />} hoverIndicator />
-
-				<Anchor href="/" icon={<House />} hoverIndicator />
-
-				<Anchor href="/games" icon={<Trophy />} hoverIndicator />
-
-				<Anchor href="/profile" icon={<UserSettings />} hoverIndicator />
+				<Anchor
+					className={window.location.pathname === '/rules' ? 'active' : ''}
+					href="/rules"
+					icon={<Notes />}
+					hoverIndicator
+				/>
+				<Anchor
+					className={window.location.pathname === '/' ? 'active' : ''}
+					href="/"
+					icon={<House />}
+					hoverIndicator
+				/>
+				{userRoomUid && userRoomUid.activeRoomUid !== '' && (
+					<Anchor
+						className={window.location.pathname === '/games' ? 'active' : ''}
+						href="/games"
+						icon={<Trophy />}
+						hoverIndicator
+					/>
+				)}
+				<Anchor
+					className={window.location.pathname === '/profile' ? 'active' : ''}
+					href="/profile"
+					icon={<UserSettings />}
+					hoverIndicator
+				/>
 			</Nav>
 			<Box
 				className="nav-margin"
@@ -76,7 +100,7 @@ export default function MainView() {
 						<Games />
 					</Route>
 					<Route path="/">
-						<Home />
+						<Home userRoomUid={userRoomUid} setUserRoomUid={setUserRoomUid} />
 					</Route>
 				</Switch>
 				{!showSidebar ? (

@@ -2,11 +2,10 @@ import { Heading, Box, Button, DropButton, Paragraph } from 'grommet';
 import {
 	deleteTable,
 	leaveTeam,
-	startMatch,
-	endMatch
+	startMatch
 } from '../../service/Games';
 import { auth, db } from '../../config/firebase-config';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Loading from '../Loading';
 import {
 	PlayFill,
@@ -23,13 +22,13 @@ export default function Table(props) {
 	const [loading, setLoading] = useState(false);
 	const [teamOne, setTeamOne] = useState([]);
 	const [teamTwo, setTeamTwo] = useState([]);
-	const [currentTeam, setCurrentTeam] = useState(null);
-	const [isUserPlaying, setIsUserPlaying] = useState(false);
-	const [showResult, setShowResult] = useState(false);
+	const [ currentTeam, setCurrentTeam ] = useState(null);
 	const [resultClaimState, setResultClaimState] = useState(false);
 	const timerEl = useRef();
+	const timerInterval = useRef();
 
-	function handleGetTeamOne() {
+	const handleGetTeamOne = useCallback(() =>
+	{
 		db.collection('games')
 			.doc(props.table)
 			.collection('teams')
@@ -48,9 +47,6 @@ export default function Table(props) {
 					.then((doc) => {
 						if (doc.exists) {
 							setCurrentTeam('team1');
-							if (props.matchInProgress && !props.endedAt) {
-								setIsUserPlaying(props.matchInProgress.toString());
-							}
 						}
 					});
 
@@ -62,9 +58,10 @@ export default function Table(props) {
 				);
 				setLoading(false);
 			});
-	}
+	}, [ props.table ])
 
-	function handleGetTeamTwo() {
+	const handleGetTeamTwo = useCallback(() =>
+	{
 		db.collection('games')
 			.doc(props.table)
 			.collection('teams')
@@ -83,9 +80,6 @@ export default function Table(props) {
 					.then((doc) => {
 						if (doc.exists) {
 							setCurrentTeam('team2');
-							if (props.matchInProgress && !props.endedAt) {
-								setIsUserPlaying(props.matchInProgress.toString());
-							}
 						}
 					});
 
@@ -97,11 +91,10 @@ export default function Table(props) {
 				);
 				setLoading(false);
 			});
-	}
+	}, [ props.table ])
 
-	var timerInterval;
-
-	function timer() {
+	const timer = useCallback(() =>
+	{
 		if (!timerEl.current) {
 			return;
 		}
@@ -111,7 +104,7 @@ export default function Table(props) {
 		const seconds = ((difference % 60000) / 1000).toFixed(0);
 		timerEl.current.innerHTML =
 			minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
-	}
+	}, [ props.endedAt, props.matchInProgress ])
 
 	useEffect(() => {
 		if (!props.matchInProgress) {
@@ -131,17 +124,17 @@ export default function Table(props) {
 		}
 
 		if (props.matchInProgress && !props.endedAt) {
-			timerInterval = setInterval(timer, 1000);
+			timerInterval.current = setInterval(timer, 1000);
 		}
 
 		return () => clearInterval(timerInterval);
-	}, [props.matchInProgress, props.roomCode, props.table, props.endedAt]);
+	}, [ props.matchInProgress, props.roomCode, props.table, props.endedAt, handleGetTeamOne, handleGetTeamTwo, timer ]);
 
 	useEffect(() => {
 		setLoading(true);
 		handleGetTeamOne();
 		handleGetTeamTwo();
-	}, []);
+	}, [ handleGetTeamOne, handleGetTeamTwo ]);
 
 	if (loading) {
 		<Loading />;
