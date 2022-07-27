@@ -18,7 +18,7 @@ export default function TeamMember(props) {
 			{
 			setLoading(false);
 		});
-	}, []);
+	}, [ props.member.id ]);
 
 	return (
 		<Box

@@ -10,7 +10,6 @@ import {
 	joinRoom,
 	leaveRoom
 } from '../../service/Rooms';
-import { percentage } from './../../scripts/helpers';
 
 export default function Home() {
 	const [loading, setLoading] = useState(false);

@@ -1,7 +1,7 @@
 import { Avatar, Box, Heading, Meter, Paragraph, Stack } from 'grommet';
 import { Home } from 'grommet-icons';
 import { useEffect, useState } from 'react';
-import { auth, db } from '../config/firebase-config';
+import { db } from '../config/firebase-config';
 import { getProfileImageUrl } from '../service/Users';
 import { percentage } from './../scripts/helpers';
 
@@ -43,12 +43,15 @@ export default function ProfileCard(props) {
 						.map((game) => {
 							if (game.data().winnerId === game.data().teamId) {
 								return game.data();
+							} else
+							{
+								return undefined;
 							}
 						})
 						.filter((item) => item !== undefined)
 				);
 			});
-	}, []);
+	}, [ props.uid ]);
 
 	console.log(games);
 

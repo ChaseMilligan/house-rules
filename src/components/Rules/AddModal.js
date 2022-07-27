@@ -8,7 +8,7 @@ import {
 	Layer,
 	Paragraph
 } from 'grommet';
-import { Add, Trash, LinkPrevious, Edit } from 'grommet-icons';
+import { Add, Trash, LinkPrevious } from 'grommet-icons';
 import { useState } from 'react';
 
 export default function AddModal(props) {
