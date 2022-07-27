@@ -21,12 +21,8 @@ export default function ProfileCard(props) {
 		}
 	}, [winLoss]);
 
-	useEffect(() => {
-		console.log(
-			wins.length,
-			games.length,
-			percentage(wins.length, games.length)
-		);
+	useEffect(() =>
+	{
 		setWinLoss(percentage(wins.length, games.length));
 	}, [games, wins]);
 
@@ -52,8 +48,6 @@ export default function ProfileCard(props) {
 				);
 			});
 	}, [ props.uid ]);
-
-	console.log(games);
 
 	return (
 		<div className="profile-card-container">

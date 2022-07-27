@@ -22,6 +22,8 @@ export default function MainView()
 {
   const [ showSidebar, setShowSidebar ] = useState(false);
   const [ loading, setLoading ] = useState(false);
+  const [ userRoomUid, setUserRoomUid ] = useState();
+
   function handleSignOut()
   {
     setLoading(true);
@@ -38,26 +40,38 @@ export default function MainView()
         return err;
       });
   }
+
   useEffect(() =>
   {
     setLoading(true);
     getUserByUid(auth.currentUser.uid).then((user) =>
     {
-      console.log(user);
-      // setLoading(false);
+      setUserRoomUid(user);
+      setLoading(false);
+    })
+      .catch((err) =>
+      {
+        console.log(err)
+        setLoading(false);
     });
   }, []);
+
+  console.log(userRoomUid)
+
   if (loading)
   {
     return <Loading />;
   }
+
   return (
     <>
       <Nav direction="row" background="brand" pad="medium" justify="around">
-        <Anchor href="/rules" icon={ <Notes /> } hoverIndicator />
-        <Anchor href="/" icon={ <House /> } hoverIndicator />
-        <Anchor href="/games" icon={ <Trophy /> } hoverIndicator />
-        <Anchor href="/profile" icon={ <UserSettings /> } hoverIndicator />
+        <Anchor className={ window.location.pathname === '/rules' ? "active" : '' } href="/rules" icon={ <Notes /> } hoverIndicator />
+        <Anchor className={ window.location.pathname === '/' ? "active" : '' } href="/" icon={ <House /> } hoverIndicator />
+        { userRoomUid && userRoomUid.activeRoomUid !== '' && (
+          <Anchor className={ window.location.pathname === '/games' ? "active" : '' } href="/games" icon={ <Trophy /> } hoverIndicator />
+        ) }
+        <Anchor className={ window.location.pathname === '/profile' ? "active" : '' } href="/profile" icon={ <UserSettings /> } hoverIndicator />
       </Nav>
       <Box
         className="nav-margin"
@@ -76,7 +90,7 @@ export default function MainView()
             <Games />
           </Route>
           <Route path="/">
-            <Home />
+            <Home userRoomUid={ userRoomUid } setUserRoomUid={ setUserRoomUid } />
           </Route>
         </Switch>
         { !showSidebar ? (

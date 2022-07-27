@@ -11,7 +11,8 @@ import {
 	leaveRoom
 } from '../../service/Rooms';
 
-export default function Home() {
+export default function Home(props)
+{
 	const [loading, setLoading] = useState(false);
 	const [room, setRoom] = useState(null);
 	const [codeValue, setCodeValue] = useState(null);
@@ -22,6 +23,10 @@ export default function Home() {
 		await createRoom(auth.currentUser.uid);
 		getUserActiveRoom(auth.currentUser.uid).then((room) => {
 			setRoom(room);
+			props.setUserRoomUid(room)
+			setLoading(false);
+		}).catch((err) =>
+		{
 			setLoading(false);
 		});
 	}
@@ -34,16 +39,21 @@ export default function Home() {
 		await joinRoom(auth.currentUser.uid, codeValue);
 		getUserActiveRoom(auth.currentUser.uid).then((room) => {
 			setRoom(room);
+			props.setUserRoomUid(room)
 			setCodeValue(null);
 			setLoading(false);
+		}).catch((err) =>
+		{
+			setLoading(false);
 		});
-		setLoading(false);
+
 	}
 
 	async function handleLeaveRoom() {
 		setLoading(true);
 		await leaveRoom(auth.currentUser.uid);
 		setRoom(null);
+		props.setUserRoomUid('')
 		setLoading(false);
 	}
 
@@ -83,8 +93,6 @@ export default function Home() {
 	if (loading) {
 		return <Loading />;
 	}
-
-	console.log(members);
 
 	if (room && members) {
 		return (
