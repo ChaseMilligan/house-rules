@@ -37,7 +37,11 @@ export default function ProfileCard(props) {
 			.doc(props.uid)
 			.collection('games')
 			.onSnapshot((snapshot) => {
-				setGames(snapshot.docs.map((game) => game.data()).filter((item) => item.endedAt !== undefined));
+				setGames(
+					snapshot.docs
+						.map((game) => game.data())
+						.filter((item) => item.endedAt !== undefined)
+				);
 				setWins(
 					snapshot.docs
 						.map((game) => {
@@ -49,8 +53,6 @@ export default function ProfileCard(props) {
 				);
 			});
 	}, []);
-
-	console.log(games);
 
 	return (
 		<div className="profile-card-container">
