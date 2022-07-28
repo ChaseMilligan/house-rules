@@ -124,3 +124,22 @@ nav a.active::before {
 	background-color: #1aa358;
 	margin-left: 2em;
 }
+
+.all-time-stats-container p {
+	position: relative;
+	background-color: #fff;
+	padding: 8px;
+}
+
+.all-time-stats-container .header::after {
+	content: '';
+	position: absolute;
+	height: 4px;
+	width: 90vw;
+	background-color: #ccc;
+	left: 50%;
+	top: 50%;
+	right: 50%;
+	transform: translate(-50%, -50%);
+	z-index: -1;
+}

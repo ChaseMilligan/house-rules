@@ -19,6 +19,7 @@ import {
 	uploadProfileImage
 } from './../../service/Users';
 import { percentage } from './../../scripts/helpers';
+import GameCard from '../../components/Profile/GameCard';
 
 export default function Profile() {
 	const [user, setUser] = useState();
@@ -32,6 +33,7 @@ export default function Profile() {
 	const [avatarUpdated, setAvatarUpdated] = useState(false);
 	const [editingName, setEditingName] = useState(false);
 	const [currentNameValue, setCurrentNameValue] = useState();
+	const [ avatarLoading, setAvatarLoading ] = useState(false);
 
 	function handleSignOut() {
 		setLoading(true);
@@ -90,24 +92,48 @@ export default function Profile() {
 		setWinLoss(percentage(wins.length, games.length));
 	}, [games, wins]);
 
+	useEffect(() =>
+	{
+
+
+	}, []);
+
 	useEffect(() => {
-		getProfileImageUrl(auth.currentUser.uid).then((url) => setAvatarURL(url));
+		setLoading(true);
+
+		getUserByUid(auth.currentUser.uid).then((data) =>
+		{
+			setUser(data);
+			setCurrentNameValue(data.name);
+			setLoading(false);
+		});
+
+		setAvatarLoading(true);
+		getProfileImageUrl(auth.currentUser.uid).then((url) =>
+		{
+			setAvatarURL(url);
+			setAvatarLoading(false);
+		});
 
 		db.collection('users')
 			.doc(auth.currentUser.uid)
 			.collection('games')
-			.onSnapshot((snapshot) => {
+			.onSnapshot((snapshot) =>
+			{
 				setGames(
 					snapshot.docs
-						.map((game) => game.data())
-						.filter((item) => item.endedAt !== undefined)
+						.map((game) => { return { id: game.id, data: game.data() } })
+						.filter((item) => item.data.endedAt !== undefined)
 				);
 				setWins(
 					snapshot.docs
-						.map((game) => {
-							if (game.data().winnerId === game.data().teamId) {
-								return game.data();
-							} else {
+						.map((game) =>
+						{
+							if (game.data().winnerId === game.data().teamId)
+							{
+								return { id: game.id, data: game.data() };
+							} else
+							{
 								return undefined;
 							}
 						})
@@ -116,15 +142,7 @@ export default function Profile() {
 			});
 	}, []);
 
-	useEffect(() => {
-		setLoading(true);
-		getUserByUid(auth.currentUser.uid).then((data) => {
-			setUser(data);
-			setCurrentNameValue(data.name);
-			setLoading(false);
-		});
-		getProfileImageUrl(auth.currentUser.uid).then((url) => setAvatarURL(url));
-	}, []);
+	console.log(games)
 
 	if (loading) {
 		return <Loading />;
@@ -150,15 +168,16 @@ export default function Profile() {
 						>
 							<Avatar
 								margin=".5em 0px"
-								src={avatarUrl || null}
+								src={ avatarUrl }
 								background="brand"
 								size="5xl"
 							>
-								{currentNameValue[0]}
+								{ avatarLoading ? (<Loading />) : (currentNameValue[ 0 ]) }
 							</Avatar>
 							<FileInput
 								className="file-input"
 								name="file"
+								disabled={ avatarLoading ? true : false }
 								onChange={(event) => {
 									const fileList = event.target.files;
 									console.log(fileList);
@@ -171,7 +190,9 @@ export default function Profile() {
 								}}
 							/>
 							{!avatarUpdated ? (
-								<Edit />
+								<>
+									{ !avatarLoading && (<Edit />) }
+								</>
 							) : (
 								<Checkmark
 									className="save"
@@ -214,42 +235,70 @@ export default function Profile() {
 							)}
 						</Box>
 					</Box>
-					<Box flex direction="row" align="center" justify="around">
-						<Box flex direction="column" align="center" justify="center">
-							<Heading margin={{ bottom: '0px' }} level="4">
-								Games Played
-							</Heading>
-							<Paragraph margin={{ top: '.25em' }}>
-								{games.length || 0}
-							</Paragraph>
-						</Box>
-						{games.length !== undefined && (
+					<Box className='all-time-stats-container' flex direction="column" align="center" justify="around">
+						<Paragraph textAlign="center" className='header'>All time stats</Paragraph>
+						<Box flex direction="row" align="center" justify="between" width="100%" pad="0px 0px 2em 0px" border={ { side: "bottom", color: '#ccc', size: '4px' } }>
+							<Box flex direction="column" align="center" justify="center">
+								<Heading margin={ { bottom: '0px' } } level="4">
+									Games Played
+								</Heading>
+								<Paragraph margin={ { top: '.25em' } }>
+									{ games.length || 0 }
+								</Paragraph>
+							</Box>
+							{ games.length !== undefined && (
 							<div className="profile-card-visuals">
-								{winLoss ? (
+									{ winLoss ? (
 									<div className="profile-card-meter">
 										<Meter
 											size="86px"
 											type="circle"
 											round
-											value={winLoss}
-											color={meterColor}
+												value={ winLoss }
+												color={ meterColor }
 										/>
-										<Heading level="4">{winLoss}%</Heading>
+											<Heading level="4">{ winLoss }%</Heading>
 									</div>
 								) : (
 									<></>
-								)}
+									) }
 							</div>
-						)}
+							) }
 
-						{wins !== undefined && (
+							{ wins !== undefined && (
 							<Box flex direction="column" align="center" justify="center">
-								<Heading margin={{ bottom: '0px' }} level="4">
+									<Heading margin={ { bottom: '0px' } } level="4">
 									Victories
 								</Heading>
-								<Paragraph margin={{ top: '.25em' }}>{wins.length}</Paragraph>
-							</Box>
-						)}
+									<Paragraph margin={ { top: '.25em' } }>{ wins.length }</Paragraph>
+								</Box>
+							) }
+						</Box>
+					</Box>
+					<Box width="100%" className='' flex direction="column" align="center" justify="around">
+						<Heading margin="1em 0px 0px 0px">Match History</Heading>
+						<Paragraph margin="0px 0px 2em 0px" textAlign='center'>Last 20 Matches</Paragraph>
+						<Box width="100%" className='' flex direction="column" align="center" justify="around">
+							{ games.map((game, index) =>
+							{
+								if (index <= 20)
+								{
+									return (
+										<GameCard
+											key={ index }
+											index={ index }
+											roomCode={ user.activeRoomUid }
+											game={ game.id }
+											matchInProgress={ game.data.matchInProgress }
+											endedAt={ game.data.endedAt }
+											winnerId={ game.data.winnerId } />
+									)
+								} else
+								{
+									return
+								}
+							}) }
+						</Box>
 					</Box>
 				</div>
 			) : (

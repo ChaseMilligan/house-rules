@@ -1,5 +1,6 @@
 import { Heading, Box, Button, DropButton, Paragraph } from 'grommet';
-import {
+import
+{
 	deleteTable,
 	leaveTeam,
 	startMatch
@@ -7,7 +8,8 @@ import {
 import { auth, db } from '../../config/firebase-config';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Loading from '../Loading';
-import {
+import
+{
 	PlayFill,
 	StopFill,
 	Run,
@@ -15,119 +17,94 @@ import {
 	MoreVertical,
 	Add
 } from 'grommet-icons';
-import Team from './Team';
-import ResultClaim from './ResultClaim';
+import Team from '../Games/Team';
 
-export default function Table(props) {
-	const [loading, setLoading] = useState(false);
-	const [teamOne, setTeamOne] = useState([]);
-	const [teamTwo, setTeamTwo] = useState([]);
+export default function GameCard(props)
+{
+	const [ loading, setLoading ] = useState(false);
+	const [ teamOne, setTeamOne ] = useState([]);
+	const [ teamTwo, setTeamTwo ] = useState([]);
 	const [ currentTeam, setCurrentTeam ] = useState(null);
-	const [resultClaimState, setResultClaimState] = useState(false);
+	const [ resultClaimState, setResultClaimState ] = useState(false);
 	const timerEl = useRef();
 	const timerInterval = useRef();
 
 	const handleGetTeamOne = useCallback(() =>
 	{
-		console.log('GETTING TEAM 1')
-		setTeamOne([]);
 		db.collection('games')
-			.doc(props.table.id)
+			.doc(props.game)
 			.collection('teams')
 			.doc('team1')
 			.collection('members')
+			.limit(25)
 			.onSnapshot(async (snapshot) =>
 			{
-				const memberCount = snapshot.docs.length;
-				if (memberCount === 0)
-				{
-					setLoading(false);
-					return;
-				}
-				let newMembers = [];
-				snapshot.docs.forEach((member) =>
-				{
-					db.collection('users')
-						.doc(member.id)
-						.onSnapshot((snapshot) =>
+				setLoading(true);
+				db.collection('games')
+					.doc(props.game)
+					.collection('teams')
+					.doc('team1')
+					.collection('members')
+					.doc(auth.currentUser.uid)
+					.get()
+					.then((doc) =>
+					{
+						if (doc.exists)
 						{
-							newMembers.push({ id: snapshot.id, data: snapshot.data() });
-							if (newMembers.length === memberCount)
-							{
-								setTeamOne(newMembers);
-								setLoading(false);
-							}
-						});
-				});
-			});
+							setCurrentTeam('team1');
+						}
+					});
 
-		db.collection('games')
-			.doc(props.table.id)
-			.collection('teams')
-			.doc('team1')
-			.collection('members')
-			.doc(auth.currentUser.uid)
-			.onSnapshot((doc) =>
-			{
-				if (doc.exists)
-				{
-					setCurrentTeam('team1');
-				}
+				setTeamOne(
+					snapshot.docs.map((member) => ({
+						data: member.data(),
+						id: member.id
+					}))
+				);
+				setLoading(false);
 			});
-	}, [ props.table ])
+	}, [ props.game ])
 
 	const handleGetTeamTwo = useCallback(() =>
 	{
-		console.log('GETTING TEAM 2')
-		setTeamTwo([]);
 		db.collection('games')
-			.doc(props.table.id)
+			.doc(props.game)
 			.collection('teams')
 			.doc('team2')
 			.collection('members')
+			.limit(25)
 			.onSnapshot(async (snapshot) =>
 			{
-				const memberCount = snapshot.docs.length;
-				if (memberCount === 0)
-				{
-					setLoading(false);
-					return;
-				}
-				let newMembers = [];
-				snapshot.docs.forEach((member) =>
-				{
-					db.collection('users')
-						.doc(member.id)
-						.onSnapshot((snapshot) =>
+				setLoading(true);
+				db.collection('games')
+					.doc(props.game)
+					.collection('teams')
+					.doc('team2')
+					.collection('members')
+					.doc(auth.currentUser.uid)
+					.get()
+					.then((doc) =>
+					{
+						if (doc.exists)
 						{
-							newMembers.push({ id: snapshot.id, data: snapshot.data() });
-							if (newMembers.length === memberCount)
-							{
-								setTeamTwo(newMembers);
-								setLoading(false);
-							}
-						});
-				});
-			});
+							setCurrentTeam('team2');
+						}
+					});
 
-		db.collection('games')
-			.doc(props.table.id)
-			.collection('teams')
-			.doc('team2')
-			.collection('members')
-			.doc(auth.currentUser.uid)
-			.onSnapshot((doc) =>
-			{
-				if (doc.exists)
-				{
-					setCurrentTeam('team2');
-				}
+				setTeamTwo(
+					snapshot.docs.map((member) => ({
+						data: member.data(),
+						id: member.id
+					}))
+				);
+				setLoading(false);
 			});
-	}, [ props.table ])
+	}, [ props.game ])
 
 	const timer = useCallback(() =>
 	{
-		if (!timerEl.current) {
+		if (!timerEl.current)
+		{
 			return;
 		}
 		const timeStamp = props.endedAt || new Date().getTime();
@@ -138,8 +115,10 @@ export default function Table(props) {
 			minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
 	}, [ props.endedAt, props.matchInProgress ])
 
-	useEffect(() => {
-		if (!props.matchInProgress) {
+	useEffect(() =>
+	{
+		if (!props.matchInProgress)
+		{
 			return;
 		}
 		setLoading(true);
@@ -147,7 +126,8 @@ export default function Table(props) {
 		handleGetTeamOne();
 		handleGetTeamTwo();
 
-		if (props.endedAt) {
+		if (props.endedAt)
+		{
 			const difference = props.endedAt - props.matchInProgress;
 			const minutes = Math.floor(difference / 60000);
 			const seconds = ((difference % 60000) / 1000).toFixed(0);
@@ -155,50 +135,35 @@ export default function Table(props) {
 				minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
 		}
 
-		if (props.matchInProgress && !props.endedAt) {
+		if (props.matchInProgress && !props.endedAt)
+		{
 			timerInterval.current = setInterval(timer, 1000);
 		}
 
 		return () => clearInterval(timerInterval);
-	}, [ props.matchInProgress, props.roomCode, props.table.id, props.endedAt, handleGetTeamOne, handleGetTeamTwo, timer ]);
+	}, [ props.matchInProgress, props.roomCode, props.game, props.endedAt, handleGetTeamOne, handleGetTeamTwo, timer ]);
 
-	useEffect(() => {
+	useEffect(() =>
+	{
 		setLoading(true);
 		handleGetTeamOne();
 		handleGetTeamTwo();
-	}, [ handleGetTeamOne, handleGetTeamTwo, currentTeam ]);
+	}, [ handleGetTeamOne, handleGetTeamTwo ]);
 
-	console.log(currentTeam)
-
-	if (loading) {
+	if (loading)
+	{
 		<Loading />;
 	}
 	return (
 		<Box
 			flex
 			direction="column"
-			key={props.index}
+			key={ props.index }
 			align="center"
 			width="100%"
-			className={props.endedAt ? 'game-table ended' : 'game-table'}
+			className={ props.endedAt ? 'game-table ended' : 'game-table' }
 			background="status-disabled"
 		>
-			{resultClaimState && (
-				<ResultClaim
-					show={resultClaimState}
-					oops={() => setResultClaimState(false)}
-					roomCode={props.roomCode}
-					claimTime={timerEl.current.innerHTML}
-					gameUid={ props.table.id }
-					matchInProgress={props.matchInProgress}
-					currentTeam={currentTeam}
-					table={ props.table.id }
-					teams={{
-						team1: teamOne.map((member) => member),
-						team2: teamTwo.map((member) => member)
-					}}
-				/>
-			)}
 
 			<Box
 				flex="shrink"
@@ -207,18 +172,18 @@ export default function Table(props) {
 				pad="0px 1.5em"
 				justify="between"
 				direction="row"
-				margin={{ bottom: '1em' }}
+				margin={ { bottom: '1em' } }
 			>
-				<Heading level="2">Game {props.index + 1}</Heading>
-				<Heading ref={timerEl}></Heading>
-				{currentTeam !== null && (
+				<Heading level="2">{ props.game.createdAt }</Heading>
+				<Heading ref={ timerEl }></Heading>
+				{ currentTeam !== null && (
 					<DropButton
 						size="small"
-						icon={<MoreVertical color="brand" size="medium" />}
-						dropAlign={{ top: 'bottom', right: 'right' }}
+						icon={ <MoreVertical color="brand" size="medium" /> }
+						dropAlign={ { top: 'bottom', right: 'right' } }
 						dropContent={
 							<Box pad=".5em" background="light-2" fill>
-								{currentTeam !== null && (
+								{ currentTeam !== null && (
 									<>
 										<Button
 											primary
@@ -226,15 +191,16 @@ export default function Table(props) {
 											color="status-critical"
 											gap="xxsmall"
 											label="Leave"
-											onClick={() => {
+											onClick={ () =>
+											{
 												setCurrentTeam(null);
 												leaveTeam(
 													auth.currentUser.uid,
-													props.table.id,
+													props.game,
 													currentTeam
 												);
-											}}
-											icon={<Run size="medium" />}
+											} }
+											icon={ <Run size="medium" /> }
 										/>
 										<Button
 											margin=".5em 0px"
@@ -242,36 +208,36 @@ export default function Table(props) {
 											label="Delete Table"
 											color="status-error"
 											gap="xxsmall"
-											onClick={ () => deleteTable(props.roomCode, props.table.id) }
-											icon={<Trash size="medium" />}
+											onClick={ () => deleteTable(props.roomCode, props.game) }
+											icon={ <Trash size="medium" /> }
 										/>
 									</>
-								)}
+								) }
 
-								{props.matchInProgress && (
+								{ props.matchInProgress && (
 									<Button
 										margin=".5em 0px"
 										primary
 										label="Call Next"
 										color="status-info"
 										gap="xxsmall"
-										onClick={ () => deleteTable(props.roomCode, props.table.id) }
-										icon={<Add size="medium" />}
+										onClick={ () => deleteTable(props.roomCode, props.game) }
+										icon={ <Add size="medium" /> }
 									/>
-								)}
+								) }
 							</Box>
 						}
 					/>
-				)}
+				) }
 			</Box>
 			<Box
 				flex
 				fill
-				direction={props.endedAt ? 'row' : 'column'}
+				direction={ props.endedAt ? 'row' : 'column' }
 				align="center"
 				justify="between"
 			>
-				{currentTeam === 'team2' && teamOne.length === 0 ? (
+				{ currentTeam === 'team2' && teamOne.length === 0 ? (
 					<Box flex fill align="center" justify="center">
 						<Paragraph>Waiting for opponent...</Paragraph>
 					</Box>
@@ -288,12 +254,12 @@ export default function Table(props) {
 						}
 					>
 						<Team
-							team={teamOne}
-							currentTeam={currentTeam}
-								table={ props.table.id }
+							team={ teamOne }
+							currentTeam={ currentTeam }
+							table={ props.game }
 							teamId="team1"
-							winnerId={props.winnerId}
-							matchInProgress={props.matchInProgress}
+							winnerId={ props.winnerId }
+							matchInProgress={ props.matchInProgress }
 						/>
 						{/* {currentMatch !== null && props.matchInProgress && (
               <Rack
@@ -302,36 +268,36 @@ export default function Table(props) {
                 currentMatch={currentMatch}
                 roomCode={props.roomCode}
                 teamId={"team1"}
-                table={props.table.id}
+                table={props.game}
                 matchInProgress={props.matchInProgress}
               />
             )} */}
 					</Box>
-				)}
-				{currentTeam && !props.matchInProgress && !props.endedAt && (
+				) }
+				{ currentTeam && !props.matchInProgress && !props.endedAt && (
 					<Button
 						label="Start Match"
 						primary
 						color="#1aa358"
-						icon={<PlayFill />}
-						onClick={ () => startMatch(props.roomCode, props.table.id) }
-						disabled={teamOne.length === 0 || teamTwo.length === 0}
+						icon={ <PlayFill /> }
+						onClick={ () => startMatch(props.roomCode, props.game) }
+						disabled={ teamOne.length === 0 || teamTwo.length === 0 }
 					/>
-				)}
-				{currentTeam && props.matchInProgress && !props.endedAt && (
+				) }
+				{ currentTeam && props.matchInProgress && !props.endedAt && (
 					<Button
 						label="End Match"
 						primary
 						color="#FF4040"
-						icon={<StopFill />}
-						onClick={() => setResultClaimState(true)}
-						disabled={!currentTeam && !props.matchInProgress}
+						icon={ <StopFill /> }
+						onClick={ () => setResultClaimState(true) }
+						disabled={ !currentTeam && !props.matchInProgress }
 					/>
-				)}
-				{!currentTeam && !props.matchInProgress && (
+				) }
+				{ !currentTeam && !props.matchInProgress && (
 					<Heading level="1">VS</Heading>
-				)}
-				{currentTeam === 'team1' && teamTwo.length === 0 ? (
+				) }
+				{ currentTeam === 'team1' && teamTwo.length === 0 ? (
 					<Box flex fill align="center" justify="center">
 						<Paragraph>Waiting for opponent...</Paragraph>
 					</Box>
@@ -348,12 +314,12 @@ export default function Table(props) {
 						}
 					>
 						<Team
-							team={teamTwo}
-							currentTeam={currentTeam}
-								table={ props.table.id }
+							team={ teamTwo }
+							currentTeam={ currentTeam }
+							table={ props.game }
 							teamId="team2"
-							winnerId={props.winnerId}
-							matchInProgress={props.matchInProgress}
+							winnerId={ props.winnerId }
+							matchInProgress={ props.matchInProgress }
 						/>
 						{/* {currentMatch !== null && props.matchInProgress && (
               <Rack
@@ -362,12 +328,12 @@ export default function Table(props) {
                 currentMatch={currentMatch}
                 roomCode={props.roomCode}
                 teamId={"team2"}
-                table={props.table.id}
+                table={props.game}
                 matchInProgress={props.matchInProgress}
               />
             )} */}
 					</Box>
-				)}
+				) }
 			</Box>
 		</Box>
 	);

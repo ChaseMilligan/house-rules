@@ -19,6 +19,8 @@ export default function TeamMember(props) {
 		});
 	}, [ props.member.id ]);
 
+	console.log(props.member)
+
 	return (
 		<Box
 			flex="grow"

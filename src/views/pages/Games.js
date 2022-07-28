@@ -48,6 +48,8 @@ export default function Games() {
 		});
 	}, []);
 
+	console.log(tables)
+
 	if (loading) {
 		return <Loading />;
 	}
@@ -61,7 +63,7 @@ export default function Games() {
 						index={index}
 						roomOwner={auth.currentUser.uid === room.roomOwner.uid}
 						roomCode={user.activeRoomUid}
-						table={table.id}
+						table={ table }
 						matchInProgress={table.data.matchInProgress}
 						endedAt={table.data.endedAt}
 						winnerId={table.data.winnerId}
