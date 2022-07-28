@@ -25,6 +25,13 @@ export async function uploadProfileImage(userUid, file) {
 		});
 }
 
+export async function changeUserName(userUid, newName) {
+	await db
+		.collection('users')
+		.doc(userUid)
+		.set({ name: newName }, { merge: true });
+}
+
 export async function getProfileImageUrl(userUid) {
 	let res = null;
 	await storage
@@ -33,8 +40,7 @@ export async function getProfileImageUrl(userUid) {
 		.then((url) => {
 			res = url;
 		})
-		.catch((err) =>
-		{
+		.catch((err) => {
 			res = err;
 		});
 	return res;

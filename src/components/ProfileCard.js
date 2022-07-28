@@ -21,8 +21,7 @@ export default function ProfileCard(props) {
 		}
 	}, [winLoss]);
 
-	useEffect(() =>
-	{
+	useEffect(() => {
 		setWinLoss(percentage(wins.length, games.length));
 	}, [games, wins]);
 
@@ -33,21 +32,26 @@ export default function ProfileCard(props) {
 			.doc(props.uid)
 			.collection('games')
 			.onSnapshot((snapshot) => {
-				setGames(snapshot.docs.map((game) => game.data()).filter((item) => item.endedAt !== undefined));
+				setGames(
+					snapshot.docs
+						.map((game) => game.data())
+						.filter((item) => item.endedAt !== undefined)
+				);
 				setWins(
 					snapshot.docs
 						.map((game) => {
 							if (game.data().winnerId === game.data().teamId) {
 								return game.data();
-							} else
-							{
+							} else {
 								return undefined;
 							}
 						})
 						.filter((item) => item !== undefined)
 				);
 			});
-	}, [ props.uid ]);
+	}, [props.uid]);
+
+	console.log(avatarUrl);
 
 	return (
 		<div className="profile-card-container">
