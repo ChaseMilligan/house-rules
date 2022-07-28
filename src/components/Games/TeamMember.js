@@ -17,6 +17,7 @@ export default function TeamMember(props) {
 			{
 			setLoading(false);
 		});
+
 	}, [ props.member.id ]);
 
 	console.log(props.member)
