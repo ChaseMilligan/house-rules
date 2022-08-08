@@ -9,8 +9,6 @@ import Loading from '../Loading';
 export default function Team(props) {
 	const [loading, setLoading] = useState(false);
 
-	console.log(props.team, props.currentTeam)
-
 	if (loading) {
 		return <Loading />;
 	}

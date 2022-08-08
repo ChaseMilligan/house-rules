@@ -9,18 +9,15 @@ export default function TeamMember(props) {
 
 	useEffect(() => {
 		setLoading(true);
-		getProfileImageUrl(props.member.id).then((url) => {
-			setAvatarURL(url);
-			setLoading(false);
-		})
-			.catch((err) =>
-			{
-			setLoading(false);
-		});
-
-	}, [ props.member.id ]);
-
-	console.log(props.member)
+		getProfileImageUrl(props.member.id)
+			.then((url) => {
+				setAvatarURL(url);
+				setLoading(false);
+			})
+			.catch((err) => {
+				setLoading(false);
+			});
+	}, [props.member.id]);
 
 	return (
 		<Box
