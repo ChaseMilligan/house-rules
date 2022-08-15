@@ -33,7 +33,8 @@ export default function Profile() {
 	const [avatarUpdated, setAvatarUpdated] = useState(false);
 	const [editingName, setEditingName] = useState(false);
 	const [currentNameValue, setCurrentNameValue] = useState();
-	const [ avatarLoading, setAvatarLoading ] = useState(false);
+	const [avatarLoading, setAvatarLoading] = useState(false);
+	const [gameData, setGameData] = useState(null);
 
 	function handleSignOut() {
 		setLoading(true);
@@ -92,25 +93,19 @@ export default function Profile() {
 		setWinLoss(percentage(wins.length, games.length));
 	}, [games, wins]);
 
-	useEffect(() =>
-	{
-
-
-	}, []);
+	useEffect(() => {}, []);
 
 	useEffect(() => {
 		setLoading(true);
 
-		getUserByUid(auth.currentUser.uid).then((data) =>
-		{
+		getUserByUid(auth.currentUser.uid).then((data) => {
 			setUser(data);
 			setCurrentNameValue(data.name);
 			setLoading(false);
 		});
 
 		setAvatarLoading(true);
-		getProfileImageUrl(auth.currentUser.uid).then((url) =>
-		{
+		getProfileImageUrl(auth.currentUser.uid).then((url) => {
 			setAvatarURL(url);
 			setAvatarLoading(false);
 		});
@@ -118,22 +113,34 @@ export default function Profile() {
 		db.collection('users')
 			.doc(auth.currentUser.uid)
 			.collection('games')
-			.onSnapshot((snapshot) =>
-			{
+			.onSnapshot((snapshot) => {
 				setGames(
 					snapshot.docs
-						.map((game) => { return { id: game.id, data: game.data() } })
+						.map((game) => {
+							const gameData = db
+								.collection('games')
+								.doc(game.id)
+								.get()
+								.then((item) => {
+									setGameData(item.data());
+								});
+							return { id: game.id, data: game.data() };
+						})
 						.filter((item) => item.data.endedAt !== undefined)
+						.sort((a, b) => {
+							if (a.data.matchInProgress < b.data.matchInProgress) {
+								return -1;
+							} else {
+								return 1;
+							}
+						})
 				);
 				setWins(
 					snapshot.docs
-						.map((game) =>
-						{
-							if (game.data().winnerId === game.data().teamId)
-							{
+						.map((game) => {
+							if (game.data().winnerId === game.data().teamId) {
 								return { id: game.id, data: game.data() };
-							} else
-							{
+							} else {
 								return undefined;
 							}
 						})
@@ -141,8 +148,6 @@ export default function Profile() {
 				);
 			});
 	}, []);
-
-	console.log(games)
 
 	if (loading) {
 		return <Loading />;
@@ -168,16 +173,16 @@ export default function Profile() {
 						>
 							<Avatar
 								margin=".5em 0px"
-								src={ avatarUrl }
+								src={avatarUrl}
 								background="brand"
 								size="5xl"
 							>
-								{ avatarLoading ? (<Loading />) : (currentNameValue[ 0 ]) }
+								{avatarLoading ? <Loading /> : currentNameValue[0]}
 							</Avatar>
 							<FileInput
 								className="file-input"
 								name="file"
-								disabled={ avatarLoading ? true : false }
+								disabled={avatarLoading ? true : false}
 								onChange={(event) => {
 									const fileList = event.target.files;
 									console.log(fileList);
@@ -190,9 +195,7 @@ export default function Profile() {
 								}}
 							/>
 							{!avatarUpdated ? (
-								<>
-									{ !avatarLoading && (<Edit />) }
-								</>
+								<>{!avatarLoading && <Edit />}</>
 							) : (
 								<Checkmark
 									className="save"
@@ -235,69 +238,100 @@ export default function Profile() {
 							)}
 						</Box>
 					</Box>
-					<Box className='all-time-stats-container' flex direction="column" align="center" justify="around">
-						<Paragraph textAlign="center" className='header'>All time stats</Paragraph>
-						<Box flex direction="row" align="center" justify="between" width="100%" pad="0px 0px 2em 0px" border={ { side: "bottom", color: '#ccc', size: '4px' } }>
+					<Box
+						className="all-time-stats-container"
+						flex
+						direction="column"
+						align="center"
+						justify="around"
+					>
+						<Paragraph textAlign="center" className="header">
+							All time stats
+						</Paragraph>
+						<Box
+							flex
+							direction="row"
+							align="center"
+							justify="between"
+							width="100%"
+							pad="0px 0px 2em 0px"
+							border={{ side: 'bottom', color: '#ccc', size: '4px' }}
+						>
 							<Box flex direction="column" align="center" justify="center">
-								<Heading margin={ { bottom: '0px' } } level="4">
+								<Heading margin={{ bottom: '0px' }} level="4">
 									Games Played
 								</Heading>
-								<Paragraph margin={ { top: '.25em' } }>
-									{ games.length || 0 }
+								<Paragraph margin={{ top: '.25em' }}>
+									{games.length || 0}
 								</Paragraph>
 							</Box>
-							{ games.length !== undefined && (
-							<div className="profile-card-visuals">
-									{ winLoss ? (
-									<div className="profile-card-meter">
-										<Meter
-											size="86px"
-											type="circle"
-											round
-												value={ winLoss }
-												color={ meterColor }
-										/>
-											<Heading level="4">{ winLoss }%</Heading>
-									</div>
-								) : (
-									<></>
-									) }
-							</div>
-							) }
+							{games.length !== undefined && (
+								<div className="profile-card-visuals">
+									{winLoss ? (
+										<div className="profile-card-meter">
+											<Meter
+												size="86px"
+												type="circle"
+												round
+												value={winLoss}
+												color={meterColor}
+											/>
+											<Heading level="4">{winLoss}%</Heading>
+										</div>
+									) : (
+										<></>
+									)}
+								</div>
+							)}
 
-							{ wins !== undefined && (
-							<Box flex direction="column" align="center" justify="center">
-									<Heading margin={ { bottom: '0px' } } level="4">
-									Victories
-								</Heading>
-									<Paragraph margin={ { top: '.25em' } }>{ wins.length }</Paragraph>
+							{wins !== undefined && (
+								<Box flex direction="column" align="center" justify="center">
+									<Heading margin={{ bottom: '0px' }} level="4">
+										Victories
+									</Heading>
+									<Paragraph margin={{ top: '.25em' }}>{wins.length}</Paragraph>
 								</Box>
-							) }
+							)}
 						</Box>
 					</Box>
-					<Box width="100%" className='' flex direction="column" align="center" justify="around">
+					<Box
+						width="100%"
+						className=""
+						flex
+						direction="column"
+						align="center"
+						justify="around"
+					>
 						<Heading margin="1em 0px 0px 0px">Match History</Heading>
-						<Paragraph margin="0px 0px 2em 0px" textAlign='center'>Last 20 Matches</Paragraph>
-						<Box width="100%" className='' flex direction="column" align="center" justify="around">
-							{ games.map((game, index) =>
-							{
-								if (index <= 20)
-								{
+						<Paragraph margin="0px 0px 2em 0px" textAlign="center">
+							Last 20 Matches
+						</Paragraph>
+						<Box
+							width="100%"
+							className=""
+							flex
+							direction="column"
+							align="center"
+							justify="around"
+						>
+							{games.reverse().map((game, index) => {
+								if (index <= 20) {
 									return (
 										<GameCard
-											key={ index }
-											index={ index }
-											roomCode={ user.activeRoomUid }
-											game={ game.id }
-											matchInProgress={ game.data.matchInProgress }
-											endedAt={ game.data.endedAt }
-											winnerId={ game.data.winnerId } />
-									)
-								} else
-								{
-									return
+											key={index}
+											index={index}
+											roomCode={user.activeRoomUid}
+											game={game}
+											gameData={gameData}
+											matchInProgress={game.data.matchInProgress}
+											endedAt={game.data.endedAt}
+											winnerId={game.data.winnerId}
+										/>
+									);
+								} else {
+									return;
 								}
-							}) }
+							})}
 						</Box>
 					</Box>
 				</div>

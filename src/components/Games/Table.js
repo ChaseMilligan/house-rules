@@ -150,8 +150,6 @@ export default function Table(props) {
 		handleGetTeamTwo();
 	}, [handleGetTeamOne, handleGetTeamTwo, currentTeam]);
 
-	console.log(props.index, minutes + ':' + (seconds < 10 ? '0' : '') + seconds);
-
 	if (loading) {
 		<Loading />;
 	}

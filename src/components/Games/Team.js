@@ -23,6 +23,7 @@ export default function Team(props) {
 		>
 			{props.team.map((member, index) => (
 				<TeamMember
+					key={index}
 					member={member}
 					index={index}
 					matchInProgress={props.matchInProgress}
