@@ -1,83 +1,52 @@
-import { Box } from "grommet";
-import Cup from "./Cup";
+import { Box } from 'grommet';
+import Cup from './Cup';
 
 export default function Rack(props) {
-  return (
-    <Box
-      flex
-      direction={props.teamId === "team1" ? "column-reverse" : "column"}
-      wrap
-      align="center"
-      justify="center"
-      classname="rack"
-    >
-      <Box width="100%" align="center">
-        <Cup
-          currentTeam={props.currentTeam}
-          isUserPlaying={props.isUserPlaying}
-          roomCode={props.roomCode}
-          table={props.table}
-          matchInProgress={props.matchInProgress}
-          currentScore={props.currentMatch.score}
-          cup={1}
-          teamId={props.teamId}
-        />
-      </Box>
-      <Box width="100%" direction="row" align="center" justify="center">
-        <Cup
-          currentTeam={props.currentTeam}
-          isUserPlaying={props.isUserPlaying}
-          roomCode={props.roomCode}
-          table={props.table}
-          matchInProgress={props.matchInProgress}
-          currentScore={props.currentMatch.score}
-          cup={2}
-          teamId={props.teamId}
-        />
-        <Cup
-          currentTeam={props.currentTeam}
-          isUserPlaying={props.isUserPlaying}
-          roomCode={props.roomCode}
-          table={props.table}
-          matchInProgress={props.matchInProgress}
-          currentScore={props.currentMatch.score}
-          cup={3}
-          teamId={props.teamId}
-        />
-      </Box>
+	return (
+		<Box
+			flex
+			direction={'column'}
+			align="center"
+			justify="center"
+			classname="rack"
+		>
+			<Box width="100%" align="center">
+				<Cup
+					currentScore={props.currentScore}
+					setCurrentScore={props.setCurrentScore}
+					cup={1}
+				/>
+			</Box>
+			<Box width="100%" direction="row" align="center" justify="center">
+				<Cup
+					currentScore={props.currentScore}
+					setCurrentScore={props.setCurrentScore}
+					cup={2}
+				/>
+				<Cup
+					currentScore={props.currentScore}
+					setCurrentScore={props.setCurrentScore}
+					cup={3}
+				/>
+			</Box>
 
-      <Box width="100%" direction="row" align="center" justify="center">
-        <Cup
-          currentTeam={props.currentTeam}
-          isUserPlaying={props.isUserPlaying}
-          roomCode={props.roomCode}
-          table={props.table}
-          matchInProgress={props.matchInProgress}
-          currentScore={props.currentMatch.score}
-          cup={4}
-          teamId={props.teamId}
-        />
-        <Cup
-          currentTeam={props.currentTeam}
-          isUserPlaying={props.isUserPlaying}
-          roomCode={props.roomCode}
-          table={props.table}
-          matchInProgress={props.matchInProgress}
-          currentScore={props.currentMatch.score}
-          cup={5}
-          teamId={props.teamId}
-        />
-        <Cup
-          currentTeam={props.currentTeam}
-          isUserPlaying={props.isUserPlaying}
-          roomCode={props.roomCode}
-          table={props.table}
-          matchInProgress={props.matchInProgress}
-          currentScore={props.currentMatch.score}
-          cup={6}
-          teamId={props.teamId}
-        />
-      </Box>
-    </Box>
-  );
+			<Box width="100%" direction="row" align="center" justify="center">
+				<Cup
+					currentScore={props.currentScore}
+					setCurrentScore={props.setCurrentScore}
+					cup={4}
+				/>
+				<Cup
+					currentScore={props.currentScore}
+					setCurrentScore={props.setCurrentScore}
+					cup={5}
+				/>
+				<Cup
+					currentScore={props.currentScore}
+					setCurrentScore={props.setCurrentScore}
+					cup={6}
+				/>
+			</Box>
+		</Box>
+	);
 }

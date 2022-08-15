@@ -1,35 +1,15 @@
-import { Box } from "grommet";
-import { toggleCup } from "../../service/Games";
+import { Box } from 'grommet';
 
 export default function Cup(props) {
-  return (
-    <Box
-      onClick={
-        props.isUserPlaying && props.currentTeam !== props.teamId
-          ? () =>
-              toggleCup(
-                props.roomCode,
-                props.table,
-                props.matchInProgress,
-                props.cup,
-                props.teamId
-              )
-          : () => {
-              console.log(
-                props.isUserPlaying,
-                props.currentTeam !== props.teamId
-              );
-              return;
-            }
-      }
-      background={
-        props.currentScore[props.teamId].includes(props.cup)
-          ? "status-critical"
-          : "dark-6"
-      }
-      className={
-        props.currentScore[props.teamId].includes(props.cup) ? "cup" : "cup hit"
-      }
-    />
-  );
+	console.log(props.currentScore.includes(1), props.cup);
+
+	return (
+		<Box
+			onClick={() => props.setCurrentScore(props.cup)}
+			background={
+				!props.currentScore.includes(props.cup) ? 'status-critical' : 'dark-6'
+			}
+			className={!props.currentScore.includes(props.cup) ? 'cup' : 'cup hit'}
+		/>
+	);
 }

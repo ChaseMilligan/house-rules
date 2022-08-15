@@ -13,6 +13,7 @@ import {
 } from 'grommet-icons';
 import Team from './Team';
 import ResultClaim from './ResultClaim';
+import ReportStats from './ReportStats';
 
 export default function Table(props) {
 	const [loading, setLoading] = useState(false);
@@ -20,6 +21,8 @@ export default function Table(props) {
 	const [teamTwo, setTeamTwo] = useState([]);
 	const [currentTeam, setCurrentTeam] = useState(null);
 	const [resultClaimState, setResultClaimState] = useState(false);
+	const [statsTracked, setStatsTracked] = useState(false);
+	const [showStatReport, setShowStatReport] = useState(false);
 	const timerEl = useRef();
 	const timerInterval = useRef();
 
@@ -28,7 +31,6 @@ export default function Table(props) {
 	const seconds = ((difference % 60000) / 1000).toFixed(0);
 
 	const handleGetTeamOne = useCallback(() => {
-		console.log('GETTING TEAM 1');
 		setTeamOne([]);
 		db.collection('games')
 			.doc(props.table.id)
@@ -69,7 +71,6 @@ export default function Table(props) {
 	}, [props.table]);
 
 	const handleGetTeamTwo = useCallback(() => {
-		console.log('GETTING TEAM 2');
 		setTeamTwo([]);
 		db.collection('games')
 			.doc(props.table.id)
@@ -121,6 +122,10 @@ export default function Table(props) {
 		timerEl.current.innerHTML = min + ':' + (sec < 10 ? '0' : '') + sec;
 	}, [props.endedAt, props.matchInProgress]);
 
+	function onModalClose() {
+		setShowStatReport(false);
+	}
+
 	useEffect(() => {
 		if (!props.matchInProgress) {
 			return;
@@ -129,13 +134,6 @@ export default function Table(props) {
 
 		handleGetTeamOne();
 		handleGetTeamTwo();
-
-		if (props.endedAt) {
-			const difference = props.endedAt - props.matchInProgress;
-			const minutes = Math.floor(difference / 60000);
-			const seconds = ((difference % 60000) / 1000).toFixed(0);
-			console.log(minutes + ':' + (seconds < 10 ? '0' : '') + seconds);
-		}
 
 		if (props.matchInProgress && !props.endedAt) {
 			timerInterval.current = setInterval(timer, 1000);
@@ -148,6 +146,20 @@ export default function Table(props) {
 		setLoading(true);
 		handleGetTeamOne();
 		handleGetTeamTwo();
+		if (currentTeam) {
+			db.collection('games')
+				.doc(props.table.id)
+				.collection('teams')
+				.doc(currentTeam)
+				.collection('members')
+				.doc(auth.currentUser.uid)
+				.get()
+				.then((user) => {
+					if (user.data().statsReported) {
+						setStatsTracked(true);
+					}
+				});
+		}
 	}, [handleGetTeamOne, handleGetTeamTwo, currentTeam]);
 
 	if (loading) {
@@ -180,6 +192,8 @@ export default function Table(props) {
 				/>
 			)}
 
+			{showStatReport && <ReportStats onModalClose={onModalClose} />}
+
 			<Box
 				flex="shrink"
 				fill="horizontal"
@@ -204,7 +218,7 @@ export default function Table(props) {
 						dropAlign={{ top: 'bottom', right: 'right' }}
 						dropContent={
 							<Box pad=".5em" background="light-2" fill>
-								{currentTeam !== null && (
+								{!props.table.data.matchInProgress && (
 									<>
 										<Button
 											primary
@@ -235,16 +249,14 @@ export default function Table(props) {
 										/>
 									</>
 								)}
-
-								{props.matchInProgress && (
+								{props.endedAt && !statsTracked && (
 									<Button
 										margin=".5em 0px"
 										primary
-										label="Call Next"
-										color="status-info"
+										label="Report Stats"
+										color="status-warning"
 										gap="xxsmall"
-										onClick={() => deleteTable(props.roomCode, props.table.id)}
-										icon={<Add size="medium" />}
+										onClick={() => setShowStatReport(true)}
 									/>
 								)}
 							</Box>

@@ -105,15 +105,12 @@ export async function createTable(roomCode, userUid, user) {
 	db.collection('rooms')
 		.doc(roomCode)
 		.get()
-		.then((room) =>
-		{
-			console.log(room.data().roomOwner.uid, doc.id)
+		.then((room) => {
 			doc.set({ roomOwnerUid: room.data().roomOwner.uid }, { merge: true });
 		})
-		.catch((err) =>
-		{
-			console.log(err)
-		})
+		.catch((err) => {
+			console.log(err);
+		});
 }
 
 export async function deleteTable(roomCode, gameUid) {
