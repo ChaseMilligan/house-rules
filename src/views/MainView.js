@@ -17,6 +17,7 @@ import Rules from './pages/Rules';
 import Games from './pages/Games';
 import { getUserByUid } from '../service/Users';
 import Loading from '../components/Loading';
+import { getUserActiveRoom } from '../service/Rooms';
 export default function MainView() {
 	const [showSidebar, setShowSidebar] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -40,13 +41,17 @@ export default function MainView() {
 		setLoading(true);
 		getUserByUid(auth.currentUser.uid)
 			.then((user) => {
-				setUserRoomUid(user);
 				setLoading(false);
 			})
 			.catch((err) => {
 				console.log(err);
 				setLoading(false);
 			});
+		getUserActiveRoom(auth.currentUser.uid).then((user) => {
+			if (user !== null) {
+				setUserRoomUid(user.uid);
+			}
+		});
 	}, []);
 
 	if (loading) {
