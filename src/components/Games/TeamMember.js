@@ -1,5 +1,5 @@
 import { Box, Avatar, Stack } from 'grommet';
-import { FormView } from 'grommet-icons';
+import { FormView, Trophy } from 'grommet-icons';
 import { useEffect, useState } from 'react';
 import Loading from '../Loading';
 import { getProfileImageUrl } from './../../service/Users';
@@ -9,7 +9,7 @@ import { db, auth } from './../../config/firebase-config';
 export default function TeamMember(props) {
 	const [avatarUrl, setAvatarURL] = useState();
 	const [loading, setLoading] = useState(false);
-	const [ userGameData, setUserGameData ] = useState();
+	const [userGameData, setUserGameData] = useState();
 
 	useEffect(() => {
 		setLoading(true);
@@ -20,9 +20,8 @@ export default function TeamMember(props) {
 			.collection('members')
 			.doc(props.member.id)
 			.get()
-			.then((user) =>
-			{
-				setUserGameData(user.data())
+			.then((user) => {
+				setUserGameData(user.data());
 			});
 		getProfileImageUrl(props.member.id)
 			.then((url) => {
@@ -32,9 +31,9 @@ export default function TeamMember(props) {
 			.catch((err) => {
 				setLoading(false);
 			});
-	}, [ props.member.id, props.table, props.teamId ]);
+	}, [props.member.id, props.table, props.teamId]);
 
-	console.log(props.table, userGameData)
+	console.log(props.table, userGameData);
 
 	return (
 		<Box
@@ -45,40 +44,55 @@ export default function TeamMember(props) {
 			align="center"
 			justify="between"
 		>
-			<Box flex direction='column' align="center" justify='center'>
-			{!loading ? (
+			<Box flex direction="column" align="center" justify="center" pad=".25em">
+				{!loading ? (
 					<Stack anchor="top-right">
 						<Avatar
 							margin=".5em 0px"
-							src={ avatarUrl }
+							src={avatarUrl}
 							background="brand"
 							size="medium"
 						>
-							{ props.member.data.name[ 0 ] }
+							{props.member.data.name[0]}
 						</Avatar>
-						{ userGameData && userGameData.eyeToEye === 'Yes' && (
+						{userGameData && userGameData.eyeToEye === 'Yes' && (
 							<Box background="#fff" pad=".05em" round="50%" className="stack">
 								<FormView color="brand" />
 							</Box>
-						) }
+						)}
 					</Stack>
-			) : (
-				<Loading />
-			)}
-				<Heading level="4" margin="0px">{ props.member.data.name }</Heading>
+				) : (
+					<Loading />
+				)}
+				<Heading level="4" margin="0px" style={{ textAlign: 'center' }}>
+					{props.member.data.name}
+				</Heading>
 			</Box>
-			{ userGameData && userGameData.statsReported && (
-				<Box flex direction='column' align='center'>
-					<Heading level="4" margin="0px">Redemption</Heading>
-					<Heading level="3" margin="0px">× { userGameData.redemptionCount || 0 }</Heading>
+			{userGameData && userGameData.statsReported && (
+				<Box flex direction="column" align="center">
+					<Heading level="4" margin="0px">
+						Redemption
+					</Heading>
+					<Heading level="3" margin="0px">
+						× {userGameData.redemptionCount || 0}
+					</Heading>
 				</Box>
-			) }
-			{ userGameData && userGameData.cupArray && (
-				<Box flex direction='column' align='center'>
-					<Heading level="4" margin="0px">Cups</Heading>
-					<Heading level="3" margin="0px">× { userGameData.cupArray.length || 0 }</Heading>
+			)}
+			{userGameData && userGameData.cupArray && (
+				<Box flex direction="column" align="center">
+					<Heading level="4" margin="0px">
+						Cups
+					</Heading>
+					<Heading level="3" margin="0px">
+						× {userGameData.cupArray.length || 0}
+					</Heading>
 				</Box>
-			) }
+			)}
+			{props.winnerId === props.teamId && (
+				<Box flex direction="column" align="center">
+					<Trophy color="brand" />
+				</Box>
+			)}
 		</Box>
 	);
 }
