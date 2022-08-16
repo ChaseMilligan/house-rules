@@ -250,36 +250,28 @@ export async function endMatch(roomCode, gameUid, winnerId, timeStamp) {
 		});
 }
 
-export async function toggleCup(
-	roomCode,
-	gameUid,
-	matchInProgress,
-	cup,
-	teamId
-) {
+export async function reportStats(roomCode, gameUid, userUid, currentTeam, cupArray, eyeToEye, redemptionCount)
+{
+	console.log(gameUid)
+	const doc = await db.collection('games').doc(gameUid).collection('teams').doc(currentTeam).collection('members').doc(userUid);
+
+	await doc.set({ statsReported: true, cupArray: cupArray, eyeToEye: eyeToEye, redemptionCount: redemptionCount }, { merge: true });
+
 	db.collection('rooms')
 		.doc(roomCode)
 		.collection('games')
 		.doc(gameUid)
-		.collection('matches')
-		.doc(matchInProgress.toString())
 		.get()
-		.then((match) => {
-			const currentScore = match.data().score[teamId];
-			const opposition = teamId === 'team1' ? 'team2' : 'team1';
-			let newScore = {};
-			if (currentScore.includes(cup)) {
-				newScore[teamId] = currentScore.filter((item) => item !== cup);
-			} else {
-				newScore[teamId] = [...currentScore, cup];
-			}
-			newScore[opposition] = match.data().score[opposition];
+		.then((game) =>
+		{
+			const reports = game.data().reports || [];
+			reports.push(userUid);
 			db.collection('rooms')
 				.doc(roomCode)
 				.collection('games')
 				.doc(gameUid)
-				.collection('matches')
-				.doc(matchInProgress.toString())
-				.update({ score: newScore });
-		});
+				.set({ reports: reports }, { merge: true });
+		})
+
+
 }

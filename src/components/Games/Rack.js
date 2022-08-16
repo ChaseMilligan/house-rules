@@ -4,7 +4,7 @@ import Cup from './Cup';
 export default function Rack(props) {
 	return (
 		<Box
-			flex
+			flex="grow"
 			direction={'column'}
 			align="center"
 			justify="center"

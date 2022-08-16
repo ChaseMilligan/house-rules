@@ -1,5 +1,5 @@
-import { Box, Button } from 'grommet';
-import { Add } from 'grommet-icons';
+import { Box, Button, Paragraph } from 'grommet';
+import { Add, Trophy } from 'grommet-icons';
 import { auth } from '../../config/firebase-config';
 import { joinTeam } from '../../service/Games';
 import { useState } from 'react';
@@ -29,6 +29,7 @@ export default function Team(props) {
 					matchInProgress={props.matchInProgress}
 					winnerId={props.winnerId}
 					teamId={props.teamId}
+					table={ props.table }
 					loading={loading}
 					setLoading={setLoading}
 				/>

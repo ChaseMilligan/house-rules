@@ -192,7 +192,7 @@ export default function Table(props) {
 				/>
 			)}
 
-			{showStatReport && <ReportStats onModalClose={onModalClose} />}
+			{ showStatReport && <ReportStats onModalClose={ onModalClose } game={ props.table } currentTeam={ currentTeam } roomCode={ props.roomCode } /> }
 
 			<Box
 				flex="shrink"
@@ -223,7 +223,6 @@ export default function Table(props) {
 										<Button
 											primary
 											margin=".5em 0px"
-											color="status-critical"
 											gap="xxsmall"
 											label="Leave"
 											onClick={() => {
@@ -259,6 +258,15 @@ export default function Table(props) {
 										onClick={() => setShowStatReport(true)}
 									/>
 								)}
+								<Button
+									margin=".5em 0px"
+									primary
+									label="Flag Opponent"
+									color="status-critical"
+									gap="xxsmall"
+									disabled
+									onClick={ () => console.log('Report function to come soon :)') }
+								/>
 							</Box>
 						}
 					/>
@@ -267,7 +275,8 @@ export default function Table(props) {
 			<Box
 				flex
 				fill
-				direction={props.endedAt ? 'row' : 'column'}
+				direction={ 'column' }
+				pad="0px 1.5em"
 				align="center"
 				justify="between"
 			>
@@ -278,9 +287,7 @@ export default function Table(props) {
 				) : (
 					<Box
 						fill
-						flex
-						direction="row"
-						align="center"
+							flex={ false }
 						className={
 							props.winnerId === 'team1'
 								? 'team-container winner'
@@ -294,18 +301,7 @@ export default function Table(props) {
 							teamId="team1"
 							winnerId={props.winnerId}
 							matchInProgress={props.matchInProgress}
-						/>
-						{/* {currentMatch !== null && props.matchInProgress && (
-              <Rack
-                currentTeam={currentTeam}
-                isUserPlaying={isUserPlaying}
-                currentMatch={currentMatch}
-                roomCode={props.roomCode}
-                teamId={"team1"}
-                table={props.table.id}
-                matchInProgress={props.matchInProgress}
-              />
-            )} */}
+							/>
 					</Box>
 				)}
 				{currentTeam && !props.matchInProgress && !props.endedAt && (
@@ -331,6 +327,9 @@ export default function Table(props) {
 				{!currentTeam && !props.matchInProgress && (
 					<Heading level="1">VS</Heading>
 				)}
+				{ props.endedAt && (
+					<Heading level="2" margin={ { top: '.25em', bottom: '.2 5em' } } >VS</Heading>
+				) }
 				{currentTeam === 'team1' && teamTwo.length === 0 ? (
 					<Box flex fill align="center" justify="center">
 						<Paragraph>Waiting for opponent...</Paragraph>
@@ -338,9 +337,7 @@ export default function Table(props) {
 				) : (
 					<Box
 						fill
-						flex
-						direction="row"
-						align="center"
+							flex={ false }
 						className={
 							props.winnerId === 'team2'
 								? 'team-container winner'
@@ -354,18 +351,7 @@ export default function Table(props) {
 							teamId="team2"
 							winnerId={props.winnerId}
 							matchInProgress={props.matchInProgress}
-						/>
-						{/* {currentMatch !== null && props.matchInProgress && (
-              <Rack
-                currentTeam={currentTeam}
-                isUserPlaying={isUserPlaying}
-                currentMatch={currentMatch}
-                roomCode={props.roomCode}
-                teamId={"team2"}
-                table={props.table.id}
-                matchInProgress={props.matchInProgress}
-              />
-            )} */}
+							/>
 					</Box>
 				)}
 			</Box>
