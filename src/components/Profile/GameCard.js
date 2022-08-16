@@ -14,6 +14,7 @@ import {
 } from 'grommet-icons';
 import Team from '../Games/Team';
 import { getUserByUid } from '../../service/Users';
+import ReportStats from '../Games/ReportStats';
 
 export default function GameCard(props) {
 	const [loading, setLoading] = useState(false);
@@ -22,6 +23,8 @@ export default function GameCard(props) {
 	const [currentTeam, setCurrentTeam] = useState(null);
 	const [partyOwner, setPartyOwner] = useState(null);
 	const [resultClaimState, setResultClaimState] = useState(false);
+	const [statsTracked, setStatsTracked] = useState(false);
+	const [showStatReport, setShowStatReport] = useState(false);
 	const timerEl = useRef();
 	const timerInterval = useRef();
 
@@ -101,6 +104,10 @@ export default function GameCard(props) {
 			minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
 	}, [props.endedAt, props.matchInProgress]);
 
+	function onModalClose() {
+		setShowStatReport(false);
+	}
+
 	useEffect(() => {
 		if (!props.matchInProgress) {
 			return;
@@ -145,9 +152,23 @@ export default function GameCard(props) {
 		setLoading(true);
 		handleGetTeamOne();
 		handleGetTeamTwo();
-	}, [handleGetTeamOne, handleGetTeamTwo]);
+		if (currentTeam) {
+			db.collection('games')
+				.doc(props.game.id)
+				.collection('teams')
+				.doc(currentTeam)
+				.collection('members')
+				.doc(auth.currentUser.uid)
+				.get()
+				.then((user) => {
+					if (user.data().statsReported) {
+						setStatsTracked(true);
+					}
+				});
+		}
+	}, [handleGetTeamOne, handleGetTeamTwo, currentTeam]);
 
-	console.log(partyOwner);
+	console.log(props.game.id);
 
 	if (loading) {
 		<Loading />;
@@ -162,16 +183,21 @@ export default function GameCard(props) {
 			background="status-disabled"
 			pad="1em"
 		>
+			{showStatReport && (
+				<ReportStats
+					onModalClose={onModalClose}
+					game={props.game}
+					currentTeam={currentTeam}
+					roomCode={props.roomCode}
+				/>
+			)}
 			{!partyOwner ? (
 				<Loading />
 			) : (
-				<Heading level="2" margin={{ bottom: '0px' }}>
+				<Heading level="3" margin={{ bottom: '0px' }}>
 					Played at {partyOwner.name}'s party
 				</Heading>
 			)}
-			<Heading level="3">
-				{moment(props.game.data.createdAt).format("ddd, MMM Do 'YY, h:mm a")}
-			</Heading>
 			<Box
 				flex="shrink"
 				fill="horizontal"
@@ -180,6 +206,9 @@ export default function GameCard(props) {
 				direction="row"
 				margin={{ bottom: '1em' }}
 			>
+				<Heading level="4">
+					{moment(props.game.data.createdAt).format("ddd, MMM Do 'YY, h:mm a")}
+				</Heading>
 				<Heading ref={timerEl}></Heading>
 				{currentTeam !== null && (
 					<DropButton
@@ -188,19 +217,18 @@ export default function GameCard(props) {
 						dropAlign={{ top: 'bottom', right: 'right' }}
 						dropContent={
 							<Box pad=".5em" background="light-2" fill>
-								{currentTeam !== null && (
+								{!props.game.data.matchInProgress && (
 									<>
 										<Button
 											primary
 											margin=".5em 0px"
-											color="status-critical"
 											gap="xxsmall"
 											label="Leave"
 											onClick={() => {
 												setCurrentTeam(null);
 												leaveTeam(
 													auth.currentUser.uid,
-													props.game.id,
+													props.table.id,
 													currentTeam
 												);
 											}}
@@ -212,42 +240,45 @@ export default function GameCard(props) {
 											label="Delete Table"
 											color="status-error"
 											gap="xxsmall"
-											onClick={() => deleteTable(props.roomCode, props.game.id)}
+											onClick={() =>
+												deleteTable(props.roomCode, props.table.id)
+											}
 											icon={<Trash size="medium" />}
 										/>
 									</>
 								)}
-
-								{props.matchInProgress && (
+								{props.endedAt && !statsTracked && (
 									<Button
 										margin=".5em 0px"
 										primary
-										label="Call Next"
-										color="status-info"
+										label="Report Stats"
+										color="status-warning"
 										gap="xxsmall"
-										onClick={() => deleteTable(props.roomCode, props.game.id)}
-										icon={<Add size="medium" />}
+										onClick={() => setShowStatReport(true)}
 									/>
 								)}
+								<Button
+									margin=".5em 0px"
+									primary
+									label="Flag Opponent"
+									color="status-critical"
+									gap="xxsmall"
+									disabled
+									onClick={() => console.log('Report function to come soon :)')}
+								/>
 							</Box>
 						}
 					/>
 				)}
 			</Box>
-			<Box
-				flex
-				fill
-				direction={props.endedAt ? 'row' : 'column'}
-				align="center"
-				justify="between"
-			>
+			<Box flex fill direction={'column'} align="center" justify="between">
 				{currentTeam === 'team2' && teamOne.length === 0 ? (
 					<Box flex fill align="center" justify="center">
 						<Paragraph>Waiting for opponent...</Paragraph>
 					</Box>
 				) : (
 					<Box
-						fill
+						fill="horizontal"
 						flex
 						direction="row"
 						align="center"
@@ -300,6 +331,11 @@ export default function GameCard(props) {
 				)}
 				{!currentTeam && !props.matchInProgress && (
 					<Heading level="1">VS</Heading>
+				)}
+				{props.endedAt && (
+					<Heading level="2" margin={{ top: '.25em', bottom: '.2 5em' }}>
+						VS
+					</Heading>
 				)}
 				{currentTeam === 'team1' && teamTwo.length === 0 ? (
 					<Box flex fill align="center" justify="center">

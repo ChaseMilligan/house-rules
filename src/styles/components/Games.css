@@ -23,7 +23,7 @@
 .team-container {
 	margin: 0.5em;
 	max-width: 100vw !important;
-	padding-inline: .5em;
+	padding-inline: 0.5em;
 }
 
 .team-container.winner {
@@ -100,7 +100,6 @@
 .result-team-card {
 	width: 50%;
 	background-color: #373752;
-	aspect-ratio: 1/1;
 }
 
 .result-team-card.winner {
