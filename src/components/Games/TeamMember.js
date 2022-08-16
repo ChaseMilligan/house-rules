@@ -73,7 +73,12 @@ export default function TeamMember(props) {
 					<Heading level="3" margin="0px">× { userGameData.redemptionCount || 0 }</Heading>
 				</Box>
 			) }
-
+			{ userGameData && userGameData.cupArray && (
+				<Box flex direction='column' align='center'>
+					<Heading level="4" margin="0px">Cups</Heading>
+					<Heading level="3" margin="0px">× { userGameData.cupArray.length || 0 }</Heading>
+				</Box>
+			) }
 		</Box>
 	);
 }

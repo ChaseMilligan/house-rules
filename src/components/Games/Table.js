@@ -274,19 +274,19 @@ export default function Table(props) {
 			</Box>
 			<Box
 				flex
-				fill
+				width="100%"
 				direction={ 'column' }
 				pad="0px 1.5em"
 				align="center"
 				justify="between"
 			>
 				{currentTeam === 'team2' && teamOne.length === 0 ? (
-					<Box flex fill align="center" justify="center">
+					<Box flex width="100%" align="center" justify="center">
 						<Paragraph>Waiting for opponent...</Paragraph>
 					</Box>
 				) : (
 					<Box
-						fill
+							width="100%"
 							flex={ false }
 						className={
 							props.winnerId === 'team1'
@@ -336,7 +336,7 @@ export default function Table(props) {
 					</Box>
 				) : (
 					<Box
-						fill
+							width="100%"
 							flex={ false }
 						className={
 							props.winnerId === 'team2'
