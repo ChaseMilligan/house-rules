@@ -27,9 +27,11 @@ export default function RuleSet(props) {
 				>
 					<Box flex direction="row" align="center" justify="between">
 						<Box flex direction="row" align="center" justify="start">
-							<div {...provided.dragHandleProps}>
-								<Drag />
-							</div>
+							{props.canEdit && (
+								<div {...provided.dragHandleProps}>
+									<Drag />
+								</div>
+							)}
 							<Heading level="3" margin={{ left: '1em' }}>
 								{props.ruleSet.name}
 							</Heading>
