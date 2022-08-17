@@ -1,44 +1,55 @@
-import { Box, Button, Heading } from "grommet";
-import { FormNextLink } from "grommet-icons";
-import { useState } from "react";
-import RuleSetModal from "./RuleSetModal";
+import { Box, Button, Heading } from 'grommet';
+import update from 'immutability-helper';
+import { FormNextLink, Drag } from 'grommet-icons';
+import { useState, useCallback, useRef } from 'react';
+import RuleSetModal from './RuleSetModal';
+import { useDrag, useDrop } from 'react-dnd';
+import RuleSet from './RuleSet';
 
 export default function RuleSetList(props) {
-  const [viewRuleSet, setViewRuleSet] = useState(false);
-  const [ruleSet, setRuleSet] = useState();
+	const [ruleSets, setRuleSets] = useState(props.ruleSets);
+	const [viewRuleSet, setViewRuleSet] = useState(false);
+	const [ruleSet, setRuleSet] = useState();
 
-  return (
-    <Box margin="1em 0px" flex fill>
-      {viewRuleSet && (
-        <RuleSetModal
-          canEdit={props.canEdit}
-          onModalClose={() => setViewRuleSet(false)}
-          ruleSet={ruleSet}
-          handleDeleteRuleSet={props.handleDeleteRuleSet}
-        />
-      )}
-      {props.ruleSets.map((ruleSet, index) => (
-        <Box
-          className="rule-item"
-          margin=".5em 0px"
-          background="light-2"
-          key={index}
-        >
-          <Box flex direction="row" align="center" justify="between">
-            <Heading level="3">{ruleSet.name}</Heading>
-            <div>
-              <Button
-                size="small"
-                icon={<FormNextLink color="dark-6" />}
-                onClick={() => {
-                  setRuleSet(ruleSet);
-                  setViewRuleSet(true);
-                }}
-              />
-            </div>
-          </Box>
-        </Box>
-      ))}
-    </Box>
-  );
+	const moveCard = useCallback((dragIndex, hoverIndex) => {
+		setRuleSets((prevCards) =>
+			update(prevCards, {
+				$splice: [
+					[dragIndex, 1],
+					[hoverIndex, 0, prevCards[dragIndex]]
+				]
+			})
+		);
+	}, []);
+
+	const renderCard = useCallback((ruleSet, index) => {
+		return (
+			<RuleSet
+				key={ruleSet.id}
+				index={index}
+				id={ruleSet.id}
+				text={ruleSet.text}
+				ruleSet={ruleSet}
+				moveCard={moveCard}
+				setRuleSet={setRuleSet}
+				canEdit={props.canEdit}
+			/>
+		);
+	}, []);
+
+	return (
+		<Box margin="1em 0px" flex fill>
+			{viewRuleSet && (
+				<RuleSetModal
+					canEdit={props.canEdit}
+					onModalClose={() => setViewRuleSet(false)}
+					ruleSet={ruleSet}
+					handleDeleteRuleSet={props.handleDeleteRuleSet}
+				/>
+			)}
+			<div className="drag-container">
+				{ruleSets.map((ruleSet, index) => renderCard(ruleSet, index))}
+			</div>
+		</Box>
+	);
 }
