@@ -129,8 +129,8 @@ export default function Home(props) {
 				<Box
 					fill
 					flex
+					style={{ minHeight: 'fit-content' }}
 					direction="row"
-					pad="1em"
 					align="center"
 					justify="around"
 				>
