@@ -30,6 +30,8 @@ export default function RuleSetModal(props) {
     setRules(newRules);
   }
 
+  console.log(value);
+
   return (
     <Layer onEsc={props.onModalClose} onClickOutside={props.onModalClose}>
       <Box overflow="scroll" padding="0px 1em">

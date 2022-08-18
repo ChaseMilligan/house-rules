@@ -60,3 +60,15 @@ export async function overwriteRules(userUid, ruleSet, newRules) {
 			return err;
 		});
 }
+
+export async function rearrangeRuleSets(newRuleSets, userUid) {
+	newRuleSets.forEach((ruleSet, index) => {
+		console.log(ruleSet);
+		db
+			.collection('ruleSets')
+			.doc(userUid)
+			.collection('sets')
+			.doc(ruleSet.name)
+			.set({index: index}, {merge: true});
+	})
+}

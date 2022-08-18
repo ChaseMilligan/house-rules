@@ -24,6 +24,7 @@ export default function Rules() {
 		setLoading(true);
 		await createRuleSet(auth.currentUser.uid, name, rules);
 		const userRuleSets = await getUserRuleSets(auth.currentUser.uid);
+		console.log(userRuleSets);
 		setRuleSets(userRuleSets);
 		setShowAddModal(false);
 		setLoading(false);
@@ -50,10 +51,18 @@ export default function Rules() {
 					setCanEdit(true);
 				}
 				const ownerRuleSets = await getUserRuleSets(activeRoom.roomOwner.uid);
-				setRuleSets(ownerRuleSets);
+				console.log(ownerRuleSets);
+				setRuleSets(ownerRuleSets.sort((a, b) => {
+					if (a.rules.index < b.rules.index) {
+						return -1;
+					} else {
+						return 1;
+					}
+			}));
 			} else {
 				setCanEdit(true);
 				const userRuleSets = await getUserRuleSets(auth.currentUser.uid);
+				console.log(userRuleSets);
 				setRuleSets(userRuleSets);
 			}
 		});
