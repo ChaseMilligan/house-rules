@@ -70,7 +70,7 @@ export async function createTable(roomCode, userUid, user) {
 	const timeStamp = new Date().getTime();
 	const doc = await db.collection('games').doc();
 
-	doc.set({ createdAt: timeStamp });
+	doc.set({ createdAt: timeStamp, createdBy: userUid });
 
 	doc
 		.collection('teams')
@@ -208,62 +208,89 @@ export async function startMatch(roomCode, gameUid) {
 
 export async function endMatch(roomCode, gameUid, winnerId, timeStamp) {
 	const doc = await db.collection('games').doc(gameUid);
+	let hasEndedAt;
 
-	await doc.set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
+	await doc.get().then((game) => {
+		console.log(game);
+		hasEndedAt = !!game.data().endedAt;
+		if (!hasEndedAt) {
+			doc.set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
 
-	db.collection('rooms')
-		.doc(roomCode)
-		.collection('games')
-		.doc(gameUid)
-		.set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
+			db.collection('rooms')
+				.doc(roomCode)
+				.collection('games')
+				.doc(gameUid)
+				.set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
 
-	await doc
-		.collection('teams')
-		.doc('team1')
-		.collection('members')
-		.get()
-		.then((snapshot) => {
-			snapshot.docs.map(async (doc) => {
-				await db
-					.collection('users')
-					.doc(doc.id)
-					.collection('games')
-					.doc(gameUid)
-					.set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
-			});
-		});
+			doc
+				.collection('teams')
+				.doc('team1')
+				.collection('members')
+				.get()
+				.then((snapshot) => {
+					snapshot.docs.map(async (doc) => {
+						await db
+							.collection('users')
+							.doc(doc.id)
+							.collection('games')
+							.doc(gameUid)
+							.set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
+					});
+				});
 
-	await doc
-		.collection('teams')
-		.doc('team2')
-		.collection('members')
-		.get()
-		.then((snapshot) => {
-			snapshot.docs.map(async (doc) => {
-				await db
-					.collection('users')
-					.doc(doc.id)
-					.collection('games')
-					.doc(gameUid)
-					.set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
-			});
-		});
+			doc
+				.collection('teams')
+				.doc('team2')
+				.collection('members')
+				.get()
+				.then((snapshot) => {
+					snapshot.docs.map(async (doc) => {
+						await db
+							.collection('users')
+							.doc(doc.id)
+							.collection('games')
+							.doc(gameUid)
+							.set({ endedAt: timeStamp, winnerId: winnerId }, { merge: true });
+					});
+				});
+		}
+	});
 }
 
-export async function reportStats(roomCode, gameUid, userUid, currentTeam, cupArray, eyeToEye, redemptionCount)
-{
-	console.log(gameUid)
-	const doc = await db.collection('games').doc(gameUid).collection('teams').doc(currentTeam).collection('members').doc(userUid);
+export async function reportStats(
+	roomCode,
+	gameUid,
+	userUid,
+	currentTeam,
+	cupArray,
+	eyeToEye,
+	redemptionCount
+) {
+	console.log(gameUid);
+	const doc = await db
+		.collection('games')
+		.doc(gameUid)
+		.collection('teams')
+		.doc(currentTeam)
+		.collection('members')
+		.doc(userUid);
 
-	await doc.set({ statsReported: true, cupArray: cupArray, eyeToEye: eyeToEye, redemptionCount: redemptionCount }, { merge: true });
+	await doc.set(
+		{
+			statsReported: true,
+			cupArray: cupArray,
+			eyeToEye: eyeToEye,
+			redemptionCount: redemptionCount
+		},
+		{ merge: true }
+	);
 
 	db.collection('rooms')
 		.doc(roomCode)
 		.collection('games')
 		.doc(gameUid)
 		.get()
-		.then((game) =>
-		{
+		.then((game) => {
 			const reports = game.data().reports || [];
 			reports.push(userUid);
 			db.collection('rooms')
@@ -271,7 +298,5 @@ export async function reportStats(roomCode, gameUid, userUid, currentTeam, cupAr
 				.collection('games')
 				.doc(gameUid)
 				.set({ reports: reports }, { merge: true });
-		})
-
-
+		});
 }

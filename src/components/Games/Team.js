@@ -16,7 +16,6 @@ export default function Team(props) {
 	return (
 		<Box
 			flex
-			fill
 			direction={props.matchInProgress ? 'column' : 'row'}
 			align={props.teamId === 'team1' ? 'start' : 'end'}
 			justify="between"
@@ -29,7 +28,7 @@ export default function Team(props) {
 					matchInProgress={props.matchInProgress}
 					winnerId={props.winnerId}
 					teamId={props.teamId}
-					table={ props.table }
+					table={props.table}
 					loading={loading}
 					setLoading={setLoading}
 				/>

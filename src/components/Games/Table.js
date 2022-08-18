@@ -279,16 +279,14 @@ export default function Table(props) {
 					/>
 				)}
 			</Box>
-			<Box
-				flex
-				width="100%"
-				direction={'column'}
-				pad=".5em"
-				align="center"
-				justify="between"
-			>
+			<Box pad=".5em" width="100%" flex justify="between">
 				{currentTeam === 'team2' && teamOne.length === 0 ? (
-					<Box flex width="100%" align="center" justify="center">
+					<Box
+						margin={{ top: '2em', bottom: '2em' }}
+						width="100%"
+						align="center"
+						justify="center"
+					>
 						<Paragraph>Waiting for opponent...</Paragraph>
 					</Box>
 				) : (
@@ -311,36 +309,46 @@ export default function Table(props) {
 						/>
 					</Box>
 				)}
-				{currentTeam && !props.matchInProgress && !props.endedAt && (
-					<Button
-						label="Start Match"
-						primary
-						color="#1aa358"
-						icon={<PlayFill />}
-						onClick={() => startMatch(props.roomCode, props.table.id)}
-						disabled={teamOne.length === 0 || teamTwo.length === 0}
-					/>
-				)}
-				{currentTeam && props.matchInProgress && !props.endedAt && (
-					<Button
-						label="End Match"
-						primary
-						color="#FF4040"
-						icon={<StopFill />}
-						onClick={() => setResultClaimState(true)}
-						disabled={!currentTeam && !props.matchInProgress}
-					/>
-				)}
-				{!currentTeam && !props.matchInProgress && (
-					<Heading level="1">VS</Heading>
-				)}
-				{props.endedAt && (
-					<Heading level="2" margin={{ top: '.25em', bottom: '.2 5em' }}>
-						VS
-					</Heading>
-				)}
+				<Box margin={{ top: '2em', bottom: '2em' }}>
+					{currentTeam && !props.matchInProgress && !props.endedAt && (
+						<Button
+							label="Start Match"
+							primary
+							color="#1aa358"
+							margin={{ top: '.25em', bottom: '.25em' }}
+							icon={<PlayFill />}
+							onClick={() => startMatch(props.roomCode, props.table.id)}
+							disabled={teamOne.length === 0 || teamTwo.length === 0}
+						/>
+					)}
+					{currentTeam && props.matchInProgress && !props.endedAt && (
+						<Button
+							label="End Match"
+							primary
+							color="#FF4040"
+							icon={<StopFill />}
+							onClick={() => setResultClaimState(true)}
+							disabled={!currentTeam && !props.matchInProgress}
+						/>
+					)}
+					{!currentTeam && !props.matchInProgress && (
+						<Heading level="1" style={{ textAlign: 'center' }}>
+							VS
+						</Heading>
+					)}
+					{props.endedAt && (
+						<Heading level="2" style={{ textAlign: 'center' }}>
+							VS
+						</Heading>
+					)}
+				</Box>
 				{currentTeam === 'team1' && teamTwo.length === 0 ? (
-					<Box flex fill align="center" justify="center">
+					<Box
+						margin={{ top: '2em', bottom: '2em' }}
+						width="100%"
+						align="center"
+						justify="center"
+					>
 						<Paragraph>Waiting for opponent...</Paragraph>
 					</Box>
 				) : (
