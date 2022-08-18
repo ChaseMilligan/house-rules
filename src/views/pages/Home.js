@@ -1,8 +1,9 @@
 import { Box, TextInput, Button, Heading, Form } from 'grommet';
-import { Bar, Aggregate, Run } from 'grommet-icons';
+import { Bar, Aggregate, Run, UserAdd } from 'grommet-icons';
 import { useEffect, useState } from 'react';
 import Loading from '../../components/Loading';
 import ProfileCard from '../../components/ProfileCard';
+import QrModal from '../../components/QrModal';
 import { auth, db } from '../../config/firebase-config';
 import {
 	createRoom,
@@ -12,10 +13,13 @@ import {
 } from '../../service/Rooms';
 
 export default function Home(props) {
+	const urlSearchParams = new URLSearchParams(window.location.search);
+	const params = Object.fromEntries(urlSearchParams.entries());
 	const [loading, setLoading] = useState(false);
 	const [room, setRoom] = useState(null);
-	const [codeValue, setCodeValue] = useState(null);
+	const [codeValue, setCodeValue] = useState(params.room || null);
 	const [members, setMembers] = useState([]);
+	const [showQrModal, setShowQrModal] = useState(false);
 
 	async function handleCreateRoom() {
 		setLoading(true);
@@ -29,6 +33,10 @@ export default function Home(props) {
 			.catch((err) => {
 				setLoading(false);
 			});
+	}
+
+	function onModalClose() {
+		setShowQrModal(false);
 	}
 
 	async function handleJoinRoom() {
@@ -61,7 +69,7 @@ export default function Home(props) {
 		if (members.length === 0) {
 			getUserActiveRoom(auth.currentUser.uid).then((room) => {
 				setRoom(room);
-				setCodeValue(null);
+				setCodeValue(params.room || null);
 				setLoading(false);
 			});
 		}
@@ -106,7 +114,7 @@ export default function Home(props) {
 		});
 	}, []);
 
-	console.log(members);
+	console.log(codeValue);
 
 	if (loading) {
 		return <Loading />;
@@ -115,7 +123,24 @@ export default function Home(props) {
 	if (room && members) {
 		return (
 			<Box fill flex align="center" justify="start">
-				<h2>{room.uid}</h2>
+				{showQrModal && (
+					<QrModal onModalClose={onModalClose} roomCode={room.uid} />
+				)}
+				<Box
+					fill
+					flex
+					direction="row"
+					pad="1em"
+					align="center"
+					justify="around"
+				>
+					<h2>{room.uid}</h2>
+					<Button
+						primary
+						icon={<UserAdd color="white" />}
+						onClick={() => setShowQrModal(true)}
+					/>
+				</Box>
 				<Button
 					size="small"
 					label="Leave Party"
@@ -145,6 +170,11 @@ export default function Home(props) {
 						<TextInput
 							placeholder="Enter House Code here..."
 							value={codeValue}
+							style={{
+								fontSize: '3em',
+								textAlign: 'center',
+								fontFamily: 'Staatliches-Regular'
+							}}
 							onChange={(event) =>
 								setCodeValue(event.target.value.toUpperCase())
 							}
@@ -154,6 +184,7 @@ export default function Home(props) {
 							primary
 							type="submit"
 							size="large"
+							disabled={!codeValue ? true : false}
 							label="Join a Party"
 							icon={<Aggregate />}
 						/>
