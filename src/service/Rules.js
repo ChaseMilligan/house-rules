@@ -10,7 +10,7 @@ export async function createRuleSet(userUid, name, rulesArray) {
 				.doc(userUid)
 				.collection('sets')
 				.doc(name)
-				.set({ rules: rulesArray });
+				.set({ rules: rulesArray, index: rulesArray.length });
 		})
 		.catch((err) => {
 			return err;
@@ -47,12 +47,13 @@ export async function getUserRuleSets(userUid) {
 }
 
 export async function overwriteRules(userUid, ruleSet, newRules) {
+	console.log(ruleSet);
 	await db
 		.collection('ruleSets')
 		.doc(userUid)
 		.collection('sets')
-		.doc(ruleSet.name)
-		.set({ rules: newRules })
+		.doc(ruleSet)
+		.set({ rules: newRules }, { merge: true })
 		.then(() => {
 			return newRules;
 		})
@@ -64,11 +65,10 @@ export async function overwriteRules(userUid, ruleSet, newRules) {
 export async function rearrangeRuleSets(newRuleSets, userUid) {
 	newRuleSets.forEach((ruleSet, index) => {
 		console.log(ruleSet);
-		db
-			.collection('ruleSets')
+		db.collection('ruleSets')
 			.doc(userUid)
 			.collection('sets')
 			.doc(ruleSet.name)
-			.set({index: index}, {merge: true});
-	})
+			.set({ index: index }, { merge: true });
+	});
 }
