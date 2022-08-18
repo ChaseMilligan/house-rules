@@ -27,6 +27,9 @@ h6 {
 h2 {
 	font-weight: 900;
 	font-size: 6em;
+	padding-top: 0.5em;
+	padding-bottom: 0.1em;
+	margin-block: 0.25em;
 }
 
 form {
