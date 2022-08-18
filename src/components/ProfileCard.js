@@ -1,9 +1,10 @@
-import { Avatar, Box, Heading, Meter, Paragraph, Stack } from 'grommet';
+import { Avatar, Box, Heading, Meter, Paragraph, Stack, Button } from 'grommet';
 import { Home } from 'grommet-icons';
 import { useEffect, useState } from 'react';
 import { db } from '../config/firebase-config';
 import { getProfileImageUrl } from '../service/Users';
 import { percentage } from './../scripts/helpers';
+import ViewProfileModal from './ViewProfileModal';
 
 export default function ProfileCard(props) {
 	const [meterColor, setMeterColor] = useState('#FFAA15');
@@ -11,6 +12,11 @@ export default function ProfileCard(props) {
 	const [games, setGames] = useState([]);
 	const [wins, setWins] = useState([]);
 	const [winLoss, setWinLoss] = useState();
+	const [showProfileModal, setShowProfileModal] = useState(false);
+
+	function onModalClose() {
+		setShowProfileModal(false);
+	}
 
 	useEffect(() => {
 		if (winLoss > 52) {
@@ -55,6 +61,9 @@ export default function ProfileCard(props) {
 
 	return (
 		<div className="profile-card-container">
+			{showProfileModal && (
+				<ViewProfileModal user={props.member} onModalClose={onModalClose} />
+			)}
 			<Box flex direction="column" align="center" justify="around">
 				<Stack anchor="top-right">
 					<Avatar
@@ -107,6 +116,12 @@ export default function ProfileCard(props) {
 					</Box>
 				)}
 			</Box>
+			<Button
+				margin={{ top: '1em' }}
+				label="View Profile"
+				primary
+				onClick={() => setShowProfileModal(true)}
+			/>
 		</div>
 	);
 }

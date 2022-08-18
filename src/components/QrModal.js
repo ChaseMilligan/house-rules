@@ -36,7 +36,7 @@ export default function QrModal(props) {
 	return (
 		<Layer onEsc={props.onModalClose} onClickOutside={props.onModalClose}>
 			<Box overflow="scroll" padding="1em">
-				<Box margin="1em 1em" flex="grow" direction="row" align="center">
+				<Box margin="2em" flex="grow" direction="row" align="center">
 					<LinkPrevious color="dark-6" onClick={props.onModalClose} />
 					<Heading margin="0px .5em" level="2">
 						QR code party invite

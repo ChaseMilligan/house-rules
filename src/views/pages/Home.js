@@ -154,6 +154,7 @@ export default function Home(props) {
 								key={member.id}
 								uid={member.id}
 								name={member.data.name}
+								member={member}
 								homeOwner={member.id === room.roomOwner.uid ? true : false}
 							/>
 						))}
