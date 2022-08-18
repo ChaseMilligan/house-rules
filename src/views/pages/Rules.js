@@ -25,7 +25,16 @@ export default function Rules() {
 		await createRuleSet(auth.currentUser.uid, name, rules);
 		const userRuleSets = await getUserRuleSets(auth.currentUser.uid);
 		console.log(userRuleSets);
-		setRuleSets(userRuleSets);
+		setRuleSets(userRuleSets.sort((a, b) =>
+		{
+			if (a.rules.index < b.rules.index)
+			{
+				return -1;
+			} else
+			{
+				return 1;
+			}
+		}));
 		setShowAddModal(false);
 		setLoading(false);
 	}
@@ -34,7 +43,16 @@ export default function Rules() {
 		setLoading(true);
 		await deleteRuleSet(auth.currentUser.uid, ruleSet);
 		const userRuleSets = await getUserRuleSets(auth.currentUser.uid);
-		setRuleSets(userRuleSets);
+		setRuleSets(userRuleSets.sort((a, b) =>
+		{
+			if (a.rules.index < b.rules.index)
+			{
+				return -1;
+			} else
+			{
+				return 1;
+			}
+		}));
 		setLoading(false);
 	}
 
@@ -63,7 +81,16 @@ export default function Rules() {
 				setCanEdit(true);
 				const userRuleSets = await getUserRuleSets(auth.currentUser.uid);
 				console.log(userRuleSets);
-				setRuleSets(userRuleSets);
+				setRuleSets(userRuleSets.sort((a, b) =>
+				{
+					if (a.rules.index < b.rules.index)
+					{
+						return -1;
+					} else
+					{
+						return 1;
+					}
+				}));
 			}
 		});
 		setUser(fetchedUser);
