@@ -130,6 +130,7 @@ export default function Table(props) {
 		if (!props.matchInProgress) {
 			return;
 		}
+		setResultClaimState(false)
 		setLoading(true);
 
 		handleGetTeamOne();

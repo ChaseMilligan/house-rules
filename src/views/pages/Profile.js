@@ -315,22 +315,18 @@ export default function Profile() {
 							justify="around"
 						>
 							{games.reverse().map((game, index) => {
-								if (index <= 20) {
-									return (
-										<GameCard
-											key={index}
-											index={index}
-											roomCode={user.activeRoomUid}
-											game={game}
-											gameData={gameData}
-											matchInProgress={game.data.matchInProgress}
-											endedAt={game.data.endedAt}
-											winnerId={game.data.winnerId}
-										/>
-									);
-								} else {
-									return;
-								}
+								return (
+									<GameCard
+										key={index}
+										index={index}
+										roomCode={user.activeRoomUid}
+										game={game}
+										gameData={gameData}
+										matchInProgress={game.data.matchInProgress}
+										endedAt={game.data.endedAt}
+										winnerId={game.data.winnerId}
+									/>
+								);
 							})}
 						</Box>
 					</Box>
