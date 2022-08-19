@@ -9,15 +9,22 @@ import {
 	TextInput
 } from 'grommet';
 import { LinkPrevious, Trash, Add, Drag } from 'grommet-icons';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { auth } from '../../config/firebase-config';
 import { overwriteRules } from '../../service/Rules';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import ConfirmationModal from '../ConfirmationModal';
 
 export default function RuleSetModal(props) {
 	const [rules, setRules] = useState(props.ruleSet.rules.rules || []);
 	const [value, setValue] = useState();
 	const [ruleSetName] = useState(props.ruleSet.name);
+	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+	const [confirmationText, setConfirmationText] = useState('Are you sure?');
+	const [confirmationFunction, setConfirmationFunction] = useState();
+	const [confirmationFunctionProps, setConfirmationFunctionProps] = useState();
+	const [confirmSubmitColor, setConfirmSubmitColor] = useState('brand');
+	const [confirmSubmitText, setConfirmSubmitText] = useState('Submit');
 
 	async function handleDeleteRule(rule) {
 		const filteredRules = rules.filter((item) => item !== rule);
@@ -50,8 +57,21 @@ export default function RuleSetModal(props) {
 		overwriteRules(auth.currentUser.uid, ruleSetName, newRules);
 	}
 
+	function handleDeleteRuleSet() {
+		props.handleDeleteRuleSet(props.ruleSet);
+	}
+
 	return (
 		<Layer onEsc={props.onModalClose} onClickOutside={props.onModalClose}>
+			<ConfirmationModal
+				showing={showConfirmationModal}
+				onModalClose={() => setShowConfirmationModal(false)}
+				confirmationText={confirmationText}
+				confirmationFunction={confirmationFunction}
+				confirmationFunctionProps={confirmationFunctionProps}
+				confirmSubmitColor={confirmSubmitColor}
+				confirmSubmitText={confirmSubmitText}
+			/>
 			<Box overflow="scroll" padding="0px 1em">
 				<Box margin="2em 2em" flex="grow" direction="row" align="center">
 					<LinkPrevious color="dark-6" onClick={props.onModalClose} />
@@ -145,7 +165,18 @@ export default function RuleSetModal(props) {
 																<Button
 																	size="large"
 																	icon={<Trash color="status-critical" />}
-																	onClick={() => handleDeleteRule(rule)}
+																	onClick={() => {
+																		setConfirmSubmitText('Delete');
+																		setConfirmSubmitColor('status-error');
+																		setConfirmationText(
+																			'Are you sure you want to DELETE this Rule?'
+																		);
+																		setConfirmationFunctionProps(rule);
+																		setConfirmationFunction(() => {
+																			return handleDeleteRule;
+																		});
+																		setShowConfirmationModal(true);
+																	}}
 																/>
 															)}
 														</Box>
@@ -167,7 +198,17 @@ export default function RuleSetModal(props) {
 								color="status-critical"
 								label="Delete Rule Set"
 								icon={<Trash />}
-								onClick={() => props.handleDeleteRuleSet(props.ruleSet)}
+								onClick={() => {
+									setConfirmSubmitText('Delete');
+									setConfirmSubmitColor('status-error');
+									setConfirmationText(
+										'Are you sure you want to DELETE this Rule Set?'
+									);
+									setConfirmationFunction(() => {
+										return handleDeleteRuleSet;
+									});
+									setShowConfirmationModal(true);
+								}}
 							/>
 						)}
 					</Box>

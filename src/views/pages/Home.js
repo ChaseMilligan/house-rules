@@ -1,6 +1,7 @@
 import { Box, TextInput, Button, Heading, Form } from 'grommet';
 import { Bar, Aggregate, Run, UserAdd } from 'grommet-icons';
 import { useEffect, useState } from 'react';
+import ConfirmationModal from '../../components/ConfirmationModal';
 import Loading from '../../components/Loading';
 import ProfileCard from '../../components/ProfileCard';
 import QrModal from '../../components/QrModal';
@@ -20,6 +21,12 @@ export default function Home(props) {
 	const [codeValue, setCodeValue] = useState(params.room || null);
 	const [members, setMembers] = useState([]);
 	const [showQrModal, setShowQrModal] = useState(false);
+	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+	const [confirmationText, setConfirmationText] = useState('Are you sure?');
+	const [confirmationFunction, setConfirmationFunction] = useState();
+	const [confirmationFunctionProps, setConfirmationFunctionProps] = useState();
+	const [confirmSubmitColor, setConfirmSubmitColor] = useState('brand');
+	const [confirmSubmitText, setConfirmSubmitText] = useState('Submit');
 
 	async function handleCreateRoom() {
 		setLoading(true);
@@ -123,6 +130,14 @@ export default function Home(props) {
 	if (room && members) {
 		return (
 			<Box fill flex align="center" justify="start">
+				<ConfirmationModal
+					showing={showConfirmationModal}
+					onModalClose={() => setShowConfirmationModal(false)}
+					confirmationText={confirmationText}
+					confirmationFunction={confirmationFunction}
+					confirmSubmitColor={confirmSubmitColor}
+					confirmSubmitText={confirmSubmitText}
+				/>
 				{showQrModal && (
 					<QrModal onModalClose={onModalClose} roomCode={room.uid} />
 				)}
@@ -145,7 +160,15 @@ export default function Home(props) {
 					size="small"
 					label="Leave Party"
 					icon={<Run />}
-					onClick={handleLeaveRoom}
+					onClick={() => {
+						setConfirmSubmitText('Leave');
+						setConfirmSubmitColor('status-error');
+						setConfirmationText('Are you sure you want to leave?');
+						setConfirmationFunction(() => {
+							return handleLeaveRoom;
+						});
+						setShowConfirmationModal(true);
+					}}
 				/>
 				<div className="container-fluid">
 					{members &&

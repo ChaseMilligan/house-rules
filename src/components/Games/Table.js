@@ -14,6 +14,7 @@ import {
 import Team from './Team';
 import ResultClaim from './ResultClaim';
 import ReportStats from './ReportStats';
+import ConfirmationModal from '../ConfirmationModal';
 
 export default function Table(props) {
 	const [loading, setLoading] = useState(false);
@@ -23,6 +24,13 @@ export default function Table(props) {
 	const [resultClaimState, setResultClaimState] = useState(false);
 	const [statsTracked, setStatsTracked] = useState(false);
 	const [showStatReport, setShowStatReport] = useState(false);
+	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+	const [confirmationText, setConfirmationText] = useState('Are you sure?');
+	const [confirmationFunction, setConfirmationFunction] = useState();
+	const [confirmationFunctionProps, setConfirmationFunctionProps] = useState();
+	const [confirmSubmitColor, setConfirmSubmitColor] = useState('brand');
+	const [confirmSubmitText, setConfirmSubmitText] = useState('Submit');
+
 	const timerEl = useRef();
 	const timerInterval = useRef();
 
@@ -126,11 +134,20 @@ export default function Table(props) {
 		setShowStatReport(false);
 	}
 
+	function handleLeaveTeam() {
+		setCurrentTeam(null);
+		leaveTeam(auth.currentUser.uid, props.table.id, currentTeam);
+	}
+
+	function handleDeleteGame() {
+		deleteTable(props.roomCode, props.table.id);
+	}
+
 	useEffect(() => {
 		if (!props.matchInProgress) {
 			return;
 		}
-		setResultClaimState(false)
+		setResultClaimState(false);
 		setLoading(true);
 
 		handleGetTeamOne();
@@ -176,6 +193,15 @@ export default function Table(props) {
 			className={props.endedAt ? 'game-table ended' : 'game-table'}
 			background="status-disabled"
 		>
+			<ConfirmationModal
+				showing={showConfirmationModal}
+				onModalClose={() => setShowConfirmationModal(false)}
+				confirmationText={confirmationText}
+				confirmationFunction={confirmationFunction}
+				confirmationFunctionProps={confirmationFunctionProps}
+				confirmSubmitColor={confirmSubmitColor}
+				confirmSubmitText={confirmSubmitText}
+			/>
 			{resultClaimState && (
 				<ResultClaim
 					show={resultClaimState}
@@ -234,24 +260,35 @@ export default function Table(props) {
 											gap="xxsmall"
 											label="Leave"
 											onClick={() => {
-												setCurrentTeam(null);
-												leaveTeam(
-													auth.currentUser.uid,
-													props.table.id,
-													currentTeam
+												setConfirmSubmitText('Leave');
+												setConfirmSubmitColor('status-error');
+												setConfirmationText(
+													'Are you sure you want to LEAVE this game?'
 												);
+												setConfirmationFunction(() => {
+													return handleLeaveTeam;
+												});
+												setShowConfirmationModal(true);
 											}}
 											icon={<Run size="medium" />}
 										/>
 										<Button
 											margin=".5em 0px"
 											primary
-											label="Delete Table"
+											label="Delete Game"
 											color="status-error"
 											gap="xxsmall"
-											onClick={() =>
-												deleteTable(props.roomCode, props.table.id)
-											}
+											onClick={() => {
+												setConfirmSubmitText('Delete');
+												setConfirmSubmitColor('status-error');
+												setConfirmationText(
+													'Are you sure you want to DELETE this game?'
+												);
+												setConfirmationFunction(() => {
+													return handleDeleteGame;
+												});
+												setShowConfirmationModal(true);
+											}}
 											icon={<Trash size="medium" />}
 										/>
 									</>
