@@ -168,7 +168,7 @@ export default function GameCard(props) {
 		}
 	}, [handleGetTeamOne, handleGetTeamTwo, currentTeam]);
 
-	console.log(props.game.id);
+	console.log(props.gameData);
 
 	if (loading) {
 		<Loading />;
